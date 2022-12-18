@@ -1,0 +1,62 @@
+
+server:
+  port: 8080
+
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  application:
+    name: api-service
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://mysql.default.svc.cluster.local:3306/walletsquire
+    username: walletsquire
+    password: walletsquire
+    driverClassName: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  web:
+    resources:
+      add-mappings: false
+#    properties:
+#      hibernate:
+#        format_sql: false
+#    show-sql: true
+
+# h2 database configuration and swagger
+#spring:
+#  datasource:
+#    #    url: jdbc:h2:mem:mydb
+#    #    username: sa
+#    #    password: password
+#    #    driverClassName: org.h2.Driver
+#    #url: jdbc:mysql://localhost:3306/walletsquire
+#    url: jdbc:mysql://mysql.default.svc.cluster.local:3306/walletsquire
+#    username: walletsquire
+#    password: walletsquire
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#  jpa:
+#    #      generate-ddl: true
+#    hibernate:
+#      #        ddl-auto: update
+#      database-patform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+#  jpa:
+#    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+
+
+
+
+#
+## show sql statement
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: debug
+#        type:
+#          descriptor:
+#            sql:
+#              BasicBinder: TRACE
