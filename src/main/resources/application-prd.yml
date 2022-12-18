@@ -1,0 +1,17 @@
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-service
+  config:
+    activate:
+      on-profile: prd
+  datasource:
+    url: jdbc:mysql://mysql-0.mysql:3306/walletsquire
+    username: walletsquire
+    password: walletsquire
+    driverClassName: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
