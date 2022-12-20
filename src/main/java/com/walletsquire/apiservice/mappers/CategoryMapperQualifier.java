@@ -3,6 +3,7 @@ package com.walletsquire.apiservice.mappers;
 import com.walletsquire.apiservice.entities.Category;
 import com.walletsquire.apiservice.services.CategoryService;
 import org.mapstruct.Named;
+import org.mapstruct.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
