@@ -8,6 +8,8 @@ import com.walletsquire.apiservice.mappers.CurrencyMapper;
 import com.walletsquire.apiservice.services.CurrencyService;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.walletsquire.apiservice.services.PaidService;
+import com.walletsquire.apiservice.services.UserService;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Order;
@@ -73,6 +75,12 @@ public class CurrencyControllerTest {
 
     @MockBean
     CategoryMapperQualifier categoryMapperQualifier;
+
+    @MockBean
+    UserService userService;
+
+    @MockBean
+    PaidService paidService;
 
     /* entities/DTOs go here for testing */
     Currency entity1 = new Currency();
