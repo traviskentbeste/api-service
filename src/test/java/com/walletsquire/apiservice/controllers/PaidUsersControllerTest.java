@@ -1,13 +1,17 @@
 package com.walletsquire.apiservice.controllers;
 
-import com.walletsquire.apiservice.entities.Address;
-import com.walletsquire.apiservice.dtos.AddressDTO;
-import com.walletsquire.apiservice.mappers.AddressMapper;
+import com.walletsquire.apiservice.dtos.PaidDTO;
+import com.walletsquire.apiservice.dtos.UserDTO;
+import com.walletsquire.apiservice.entities.Paid;
+import com.walletsquire.apiservice.entities.PaidUsers;
+import com.walletsquire.apiservice.dtos.PaidUsersDTO;
+import com.walletsquire.apiservice.entities.User;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
-import com.walletsquire.apiservice.services.AddressService;
+import com.walletsquire.apiservice.mappers.PaidUsersMapper;
+import com.walletsquire.apiservice.services.PaidService;
+import com.walletsquire.apiservice.services.PaidUsersService;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.walletsquire.apiservice.services.PaidService;
 import com.walletsquire.apiservice.services.UserService;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -31,9 +35,11 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolationException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,12 +52,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-@WebMvcTest( controllers = AddressController.class )
-@ComponentScan(basePackageClasses = AddressMapper.class)
+@WebMvcTest( controllers = PaidUsersController.class )
+@ComponentScan(basePackageClasses = PaidUsersMapper.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ActiveProfiles("dev")
 @TestMethodOrder(OrderAnnotation.class)
-public class AddressControllerTest {
+public class PaidUsersControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -60,16 +66,16 @@ public class AddressControllerTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    AddressMapper mapper;
+    PaidUsersMapper mapper;
 
     @Autowired
-    AddressController controller;
+    PaidUsersController controller;
 
     String endpoint = "/api/v1" + controller.endpoint;
 
     // mock objects
     @MockBean
-    AddressService service;
+    PaidUsersService service;
 
     @MockBean
     CategoryMapperQualifier categoryMapperQualifier;
@@ -81,10 +87,10 @@ public class AddressControllerTest {
     PaidService paidService;
 
     /* entities/DTOs go here for testing */
-    Address entity1 = new Address();
-    Address entity2 = new Address();
-    AddressDTO entityDTO1 = new AddressDTO();
-    AddressDTO entityDTO2 = new AddressDTO();
+    PaidUsers entity1 = new PaidUsers();
+    PaidUsers entity2 = new PaidUsers();
+    PaidUsersDTO entityDTO1 = new PaidUsersDTO();
+    PaidUsersDTO entityDTO2 = new PaidUsersDTO();
 
     public String asJsonString(final Object obj) {
         try {
@@ -98,11 +104,31 @@ public class AddressControllerTest {
     @Order(1)
     public void create() throws Exception {
 
+        Paid paid1 = new Paid();
+        paid1.setId(1L);
+
+        User user1 = new User();
+        user1.setId(1L);
+
+        PaidDTO paidDTO = new PaidDTO();
+        paidDTO.setId(1L);
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(1L);
+
         entity1.setId(1L);
-        entity1.setRoute("myName1");
+        entity1.setAmount(BigDecimal.valueOf(1));
+        entity1.setPaid(paid1);
+        entity1.setUser(user1);
 
         entityDTO1.setId(1L);
-        entityDTO1.setRoute("myName1");
+        entityDTO1.setAmount(BigDecimal.valueOf(1));
+        entityDTO1.setPaid(paidDTO);
+        entityDTO1.setUser(userDTO);
+
+        when(paidService.getById(1L)).thenReturn(Optional.of(paid1));
+
+        when(userService.getById(1L)).thenReturn(Optional.of(user1));
 
         when(service.create(entity1)).thenReturn(entity1);
 
@@ -124,7 +150,7 @@ public class AddressControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.route", equalTo("myName1")))
+                .andExpect(jsonPath("$.amount", equalTo(1)))
                 .andDo(print())
                 ;
 
@@ -135,7 +161,7 @@ public class AddressControllerTest {
     public void getById() throws Exception {
 
         entity1.setId(1L);
-        entity1.setRoute("myName1");
+        entity1.setAmount(BigDecimal.valueOf(1));
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
@@ -144,7 +170,7 @@ public class AddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.route", equalTo("myName1")));
+                .andExpect(jsonPath("$.amount", equalTo(1)));
 
     }
 
@@ -152,9 +178,9 @@ public class AddressControllerTest {
     @Order(3)
     public void getAll() throws Exception {
 
-        entity1.setRoute("myName1");
+        entity1.setAmount(BigDecimal.valueOf(1));
 
-        List<Address> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
+        List<PaidUsers> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
 
         when(service.getAll()).thenReturn(entitys);
 
@@ -164,7 +190,7 @@ public class AddressControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].route", equalTo("myName1")));
+                .andExpect(jsonPath("$[0].amount", equalTo(1)));
 
     }
 
@@ -172,15 +198,35 @@ public class AddressControllerTest {
     @Order(4)
     public void update() throws Exception {
 
+        Paid paid1 = new Paid();
+        paid1.setId(1L);
+
+        User user1 = new User();
+        user1.setId(1L);
+
+        PaidDTO paidDTO = new PaidDTO();
+        paidDTO.setId(1L);
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(1L);
+
         entity1.setId(1L);
-        entity1.setRoute("myName1");
+        entity1.setAmount(BigDecimal.valueOf(1));
+        entity1.setPaid(paid1);
+        entity1.setUser(user1);
 
         entityDTO1.setId(1L);
-        entityDTO1.setRoute("myName1");
+        entityDTO1.setAmount(BigDecimal.valueOf(1));
+        entityDTO1.setPaid(paidDTO);
+        entityDTO1.setUser(userDTO);
+
+        when(paidService.getById(1L)).thenReturn(Optional.of(paid1));
+
+        when(userService.getById(1L)).thenReturn(Optional.of(user1));
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
-        when(service.update(entity1, entity1.getId())).thenReturn(entity1);
+        when(service.update(entity1, entityDTO1, entity1.getId())).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.put(endpoint + "/" + entityDTO1.getId() )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -190,7 +236,7 @@ public class AddressControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.route", is("myName1")));
+                .andExpect(jsonPath("$.amount", is(1)));
 
     }
 
@@ -404,7 +450,7 @@ public class AddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
-                .andExpect(result -> assertEquals("Address was not found for parameters {id=2}", result.getResolvedException().getMessage()));
+                .andExpect(result -> assertEquals("PaidUsers was not found for parameters {id=2}", result.getResolvedException().getMessage()));
 
     }
 

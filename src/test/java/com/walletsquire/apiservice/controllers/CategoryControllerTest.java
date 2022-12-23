@@ -6,6 +6,8 @@ import com.walletsquire.apiservice.mappers.CategoryMapper;
 import com.walletsquire.apiservice.services.CategoryService;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.walletsquire.apiservice.services.PaidService;
+import com.walletsquire.apiservice.services.UserService;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Order;
@@ -67,6 +69,12 @@ public class CategoryControllerTest {
     // mock objects
     @MockBean
     CategoryService service;
+
+    @MockBean
+    UserService userService;
+
+    @MockBean
+    PaidService paidService;
 
     /* entities/DTOs go here for testing */
     Category entity1 = new Category();

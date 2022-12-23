@@ -1,13 +1,12 @@
 package com.walletsquire.apiservice.controllers;
 
-import com.walletsquire.apiservice.entities.Address;
-import com.walletsquire.apiservice.dtos.AddressDTO;
-import com.walletsquire.apiservice.mappers.AddressMapper;
+import com.walletsquire.apiservice.entities.Paid;
+import com.walletsquire.apiservice.dtos.PaidDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
-import com.walletsquire.apiservice.services.AddressService;
+import com.walletsquire.apiservice.mappers.PaidMapper;
+import com.walletsquire.apiservice.services.PaidService;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.walletsquire.apiservice.services.PaidService;
 import com.walletsquire.apiservice.services.UserService;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -46,12 +45,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-@WebMvcTest( controllers = AddressController.class )
-@ComponentScan(basePackageClasses = AddressMapper.class)
+@WebMvcTest( controllers = PaidController.class )
+@ComponentScan(basePackageClasses = PaidMapper.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ActiveProfiles("dev")
 @TestMethodOrder(OrderAnnotation.class)
-public class AddressControllerTest {
+public class PaidControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -60,16 +59,16 @@ public class AddressControllerTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    AddressMapper mapper;
+    PaidMapper mapper;
 
     @Autowired
-    AddressController controller;
+    PaidController controller;
 
     String endpoint = "/api/v1" + controller.endpoint;
 
     // mock objects
     @MockBean
-    AddressService service;
+    PaidService service;
 
     @MockBean
     CategoryMapperQualifier categoryMapperQualifier;
@@ -77,14 +76,11 @@ public class AddressControllerTest {
     @MockBean
     UserService userService;
 
-    @MockBean
-    PaidService paidService;
-
     /* entities/DTOs go here for testing */
-    Address entity1 = new Address();
-    Address entity2 = new Address();
-    AddressDTO entityDTO1 = new AddressDTO();
-    AddressDTO entityDTO2 = new AddressDTO();
+    Paid entity1 = new Paid();
+    Paid entity2 = new Paid();
+    PaidDTO entityDTO1 = new PaidDTO();
+    PaidDTO entityDTO2 = new PaidDTO();
 
     public String asJsonString(final Object obj) {
         try {
@@ -99,10 +95,10 @@ public class AddressControllerTest {
     public void create() throws Exception {
 
         entity1.setId(1L);
-        entity1.setRoute("myName1");
+        entity1.setType("myName1");
 
         entityDTO1.setId(1L);
-        entityDTO1.setRoute("myName1");
+        entityDTO1.setType("myName1");
 
         when(service.create(entity1)).thenReturn(entity1);
 
@@ -124,7 +120,7 @@ public class AddressControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.route", equalTo("myName1")))
+                .andExpect(jsonPath("$.type", equalTo("myName1")))
                 .andDo(print())
                 ;
 
@@ -135,7 +131,7 @@ public class AddressControllerTest {
     public void getById() throws Exception {
 
         entity1.setId(1L);
-        entity1.setRoute("myName1");
+        entity1.setType("myName1");
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
@@ -144,7 +140,7 @@ public class AddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.route", equalTo("myName1")));
+                .andExpect(jsonPath("$.type", equalTo("myName1")));
 
     }
 
@@ -152,9 +148,9 @@ public class AddressControllerTest {
     @Order(3)
     public void getAll() throws Exception {
 
-        entity1.setRoute("myName1");
+        entity1.setType("myName1");
 
-        List<Address> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
+        List<Paid> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
 
         when(service.getAll()).thenReturn(entitys);
 
@@ -164,7 +160,7 @@ public class AddressControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].route", equalTo("myName1")));
+                .andExpect(jsonPath("$[0].type", equalTo("myName1")));
 
     }
 
@@ -173,10 +169,10 @@ public class AddressControllerTest {
     public void update() throws Exception {
 
         entity1.setId(1L);
-        entity1.setRoute("myName1");
+        entity1.setType("myName1");
 
         entityDTO1.setId(1L);
-        entityDTO1.setRoute("myName1");
+        entityDTO1.setType("myName1");
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
@@ -190,7 +186,7 @@ public class AddressControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.route", is("myName1")));
+                .andExpect(jsonPath("$.type", is("myName1")));
 
     }
 
@@ -404,7 +400,7 @@ public class AddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
-                .andExpect(result -> assertEquals("Address was not found for parameters {id=2}", result.getResolvedException().getMessage()));
+                .andExpect(result -> assertEquals("Paid was not found for parameters {id=2}", result.getResolvedException().getMessage()));
 
     }
 
