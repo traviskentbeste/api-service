@@ -8,11 +8,9 @@ import com.walletsquire.apiservice.dtos.PaidUsersDTO;
 import com.walletsquire.apiservice.entities.User;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
 import com.walletsquire.apiservice.mappers.PaidUsersMapper;
-import com.walletsquire.apiservice.services.PaidService;
-import com.walletsquire.apiservice.services.PaidUsersService;
+import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.walletsquire.apiservice.services.UserService;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Order;
@@ -85,6 +83,12 @@ public class PaidUsersControllerTest {
 
     @MockBean
     PaidService paidService;
+
+    @MockBean
+    AddressService addressService;
+
+    @MockBean
+    CurrencyService currencyService;
 
     /* entities/DTOs go here for testing */
     PaidUsers entity1 = new PaidUsers();

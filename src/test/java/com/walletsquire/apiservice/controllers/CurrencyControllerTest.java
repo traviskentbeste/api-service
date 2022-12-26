@@ -5,6 +5,7 @@ import com.walletsquire.apiservice.dtos.CurrencyDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapper;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
 import com.walletsquire.apiservice.mappers.CurrencyMapper;
+import com.walletsquire.apiservice.services.AddressService;
 import com.walletsquire.apiservice.services.CurrencyService;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,6 +82,9 @@ public class CurrencyControllerTest {
 
     @MockBean
     PaidService paidService;
+
+    @MockBean
+    AddressService addressService;
 
     /* entities/DTOs go here for testing */
     Currency entity1 = new Currency();

@@ -3,11 +3,9 @@ package com.walletsquire.apiservice.controllers;
 import com.walletsquire.apiservice.entities.Category;
 import com.walletsquire.apiservice.dtos.CategoryDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapper;
-import com.walletsquire.apiservice.services.CategoryService;
+import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.walletsquire.apiservice.services.PaidService;
-import com.walletsquire.apiservice.services.UserService;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Order;
@@ -75,6 +73,12 @@ public class CategoryControllerTest {
 
     @MockBean
     PaidService paidService;
+
+    @MockBean
+    AddressService addressService;
+
+    @MockBean
+    CurrencyService currencyService;
 
     /* entities/DTOs go here for testing */
     Category entity1 = new Category();

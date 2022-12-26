@@ -1,12 +1,14 @@
 package com.walletsquire.apiservice.controllers;
 
-import com.walletsquire.apiservice.entities.User;
-import com.walletsquire.apiservice.dtos.UserDTO;
+import com.walletsquire.apiservice.dtos.AddressDTO;
+import com.walletsquire.apiservice.dtos.CurrencyDTO;
+import com.walletsquire.apiservice.entities.Address;
+import com.walletsquire.apiservice.entities.Currency;
+import com.walletsquire.apiservice.entities.Event;
+import com.walletsquire.apiservice.dtos.EventDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
-import com.walletsquire.apiservice.mappers.UserMapper;
-import com.walletsquire.apiservice.services.AddressService;
-import com.walletsquire.apiservice.services.CurrencyService;
-import com.walletsquire.apiservice.services.UserService;
+import com.walletsquire.apiservice.mappers.EventMapper;
+import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -34,6 +36,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,12 +49,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-@WebMvcTest( controllers = UserController.class )
-@ComponentScan(basePackageClasses = UserMapper.class)
+@WebMvcTest( controllers = EventController.class )
+@ComponentScan(basePackageClasses = EventMapper.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ActiveProfiles("dev")
 @TestMethodOrder(OrderAnnotation.class)
-public class UserControllerTest {
+public class EventControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -60,16 +63,16 @@ public class UserControllerTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    UserMapper mapper;
+    EventMapper mapper;
 
     @Autowired
-    UserController controller;
+    EventController controller;
 
     String endpoint = "/api/v1" + controller.endpoint;
 
     // mock objects
     @MockBean
-    UserService service;
+    EventService service;
 
     @MockBean
     CategoryMapperQualifier categoryMapperQualifier;
@@ -78,13 +81,19 @@ public class UserControllerTest {
     AddressService addressService;
 
     @MockBean
+    PaidService paidService;
+
+    @MockBean
     CurrencyService currencyService;
 
+    @MockBean
+    UserService userService;
+
     /* entities/DTOs go here for testing */
-    User entity1 = new User();
-    User entity2 = new User();
-    UserDTO entityDTO1 = new UserDTO();
-    UserDTO entityDTO2 = new UserDTO();
+    Event entity1 = new Event();
+    Event entity2 = new Event();
+    EventDTO entityDTO1 = new EventDTO();
+    EventDTO entityDTO2 = new EventDTO();
 
     public String asJsonString(final Object obj) {
         try {
@@ -98,12 +107,30 @@ public class UserControllerTest {
     @Order(1)
     public void create() throws Exception {
 
+        Address address = new Address();
+        address.setId(1L);
+
+        Currency currency = new Currency();
+        currency.setId(1L);
+
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setId(1L);
+
+        CurrencyDTO currencyDTO = new CurrencyDTO();
+        currencyDTO.setId(1L);
+
         entity1.setId(1L);
-        entity1.setFirstName("myName1");
+        entity1.setName("myName1");
+        entity1.setAddress(address);
+        entity1.setCurrency(currency);
 
         entityDTO1.setId(1L);
-        entityDTO1.setFirstName("myName1");
+        entityDTO1.setName("myName1");
+        entityDTO1.setAddress(addressDTO);
+        entityDTO1.setCurrency(currencyDTO);
 
+        when(addressService.getById(address.getId())).thenReturn(Optional.of(address));
+        when(currencyService.getById(currency.getId())).thenReturn(Optional.of(currency));
         when(service.create(entity1)).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders
@@ -124,7 +151,7 @@ public class UserControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.firstName", equalTo("myName1")))
+                .andExpect(jsonPath("$.name", equalTo("myName1")))
                 .andDo(print())
                 ;
 
@@ -135,7 +162,7 @@ public class UserControllerTest {
     public void getById() throws Exception {
 
         entity1.setId(1L);
-        entity1.setFirstName("myName1");
+        entity1.setName("myName1");
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
@@ -144,7 +171,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.firstName", equalTo("myName1")));
+                .andExpect(jsonPath("$.name", equalTo("myName1")));
 
     }
 
@@ -152,9 +179,9 @@ public class UserControllerTest {
     @Order(3)
     public void getAll() throws Exception {
 
-        entity1.setFirstName("myName1");
+        entity1.setName("myName1");
 
-        List<User> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
+        List<Event> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
 
         when(service.getAll()).thenReturn(entitys);
 
@@ -164,7 +191,7 @@ public class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].firstName", equalTo("myName1")));
+                .andExpect(jsonPath("$[0].name", equalTo("myName1")));
 
     }
 
@@ -173,10 +200,10 @@ public class UserControllerTest {
     public void update() throws Exception {
 
         entity1.setId(1L);
-        entity1.setFirstName("myName1");
+        entity1.setName("myName1");
 
         entityDTO1.setId(1L);
-        entityDTO1.setFirstName("myName1");
+        entityDTO1.setName("myName1");
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
@@ -190,7 +217,7 @@ public class UserControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.firstName", is("myName1")));
+                .andExpect(jsonPath("$.name", is("myName1")));
 
     }
 
@@ -404,7 +431,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
-                .andExpect(result -> assertEquals("User was not found for parameters {id=2}", result.getResolvedException().getMessage()));
+                .andExpect(result -> assertEquals("Event was not found for parameters {id=2}", result.getResolvedException().getMessage()));
 
     }
 
