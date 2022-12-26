@@ -4,6 +4,8 @@ import com.walletsquire.apiservice.entities.User;
 import com.walletsquire.apiservice.dtos.UserDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
 import com.walletsquire.apiservice.mappers.UserMapper;
+import com.walletsquire.apiservice.services.AddressService;
+import com.walletsquire.apiservice.services.CurrencyService;
 import com.walletsquire.apiservice.services.UserService;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,6 +73,12 @@ public class UserControllerTest {
 
     @MockBean
     CategoryMapperQualifier categoryMapperQualifier;
+
+    @MockBean
+    AddressService addressService;
+
+    @MockBean
+    CurrencyService currencyService;
 
     /* entities/DTOs go here for testing */
     User entity1 = new User();

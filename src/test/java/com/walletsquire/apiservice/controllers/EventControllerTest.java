@@ -2,8 +2,9 @@ package com.walletsquire.apiservice.controllers;
 
 import com.walletsquire.apiservice.entities.Event;
 import com.walletsquire.apiservice.dtos.EventDTO;
+import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
 import com.walletsquire.apiservice.mappers.EventMapper;
-import com.walletsquire.apiservice.services.EventService;
+import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -67,6 +68,21 @@ public class EventControllerTest {
     // mock objects
     @MockBean
     EventService service;
+
+    @MockBean
+    CategoryMapperQualifier categoryMapperQualifier;
+
+    @MockBean
+    AddressService addressService;
+
+    @MockBean
+    PaidService paidService;
+
+    @MockBean
+    CurrencyService currencyService;
+
+    @MockBean
+    UserService userService;
 
     /* entities/DTOs go here for testing */
     Event entity1 = new Event();

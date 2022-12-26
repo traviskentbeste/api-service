@@ -11,7 +11,7 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:mysql://mysql.default.svc.cluster.local:3306/walletsquire
+    url: jdbc:mysql://mysql.local:3306/walletsquire
     username: walletsquire
     password: walletsquire
     driverClassName: com.mysql.cj.jdbc.Driver

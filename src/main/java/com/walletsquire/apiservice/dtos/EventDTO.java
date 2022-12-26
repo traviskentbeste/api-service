@@ -19,7 +19,7 @@ public class EventDTO {
     private String description;
     private String endDatetimestamp;
     private String startDatetimestamp;
-    private Long address;
-    private Long currency;
+    private AddressDTO address;
+    private CurrencyDTO currency;
 
 }

@@ -4,6 +4,8 @@ import com.walletsquire.apiservice.entities.Paid;
 import com.walletsquire.apiservice.dtos.PaidDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
 import com.walletsquire.apiservice.mappers.PaidMapper;
+import com.walletsquire.apiservice.services.AddressService;
+import com.walletsquire.apiservice.services.CurrencyService;
 import com.walletsquire.apiservice.services.PaidService;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,6 +77,12 @@ public class PaidControllerTest {
 
     @MockBean
     UserService userService;
+
+    @MockBean
+    AddressService addressService;
+
+    @MockBean
+    CurrencyService currencyService;
 
     /* entities/DTOs go here for testing */
     Paid entity1 = new Paid();

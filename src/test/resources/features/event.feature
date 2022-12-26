@@ -3,7 +3,6 @@ Feature:  Cucumber: Event tests
 
   Background:
     Given The application is available at "http://localhost" with endpoint "/api/v1/event"
-    And Health check is ok
 
   Scenario: Check that there are at least 1 event
     When I fetch the event

@@ -36,16 +36,6 @@ public class EventSteps {
 
     }
 
-    @And("Health check is ok")
-    public void healthCheckIsFineAt() {
-
-        ResponseEntity<String> response = cucumberHttpClient.getAll(requestUrl, "/actuator/health");
-        Gson gson = new Gson();
-        Health health = gson.fromJson(response.getBody(), Health.class);
-        assertEquals(health.getStatus(), "UP");
-
-    }
-
     @When("I fetch the event")
     public void iFetchArray() {
 
