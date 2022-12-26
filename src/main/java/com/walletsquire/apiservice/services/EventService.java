@@ -1,6 +1,10 @@
 package com.walletsquire.apiservice.services;
 
+import com.walletsquire.apiservice.entities.Address;
+import com.walletsquire.apiservice.entities.Currency;
 import com.walletsquire.apiservice.entities.Event;
+import com.walletsquire.apiservice.repositories.AddressRepository;
+import com.walletsquire.apiservice.repositories.CurrencyRepository;
 import com.walletsquire.apiservice.repositories.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +21,6 @@ public class EventService {
     public Event create(Event event) {
 
         return eventRepository.save(event);
-
     }
 
     public Optional<Event> getById(Long id) {

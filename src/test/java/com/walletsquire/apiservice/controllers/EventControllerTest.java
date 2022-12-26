@@ -1,5 +1,9 @@
 package com.walletsquire.apiservice.controllers;
 
+import com.walletsquire.apiservice.dtos.AddressDTO;
+import com.walletsquire.apiservice.dtos.CurrencyDTO;
+import com.walletsquire.apiservice.entities.Address;
+import com.walletsquire.apiservice.entities.Currency;
 import com.walletsquire.apiservice.entities.Event;
 import com.walletsquire.apiservice.dtos.EventDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
@@ -32,6 +36,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -102,12 +107,30 @@ public class EventControllerTest {
     @Order(1)
     public void create() throws Exception {
 
+        Address address = new Address();
+        address.setId(1L);
+
+        Currency currency = new Currency();
+        currency.setId(1L);
+
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setId(1L);
+
+        CurrencyDTO currencyDTO = new CurrencyDTO();
+        currencyDTO.setId(1L);
+
         entity1.setId(1L);
         entity1.setName("myName1");
+        entity1.setAddress(address);
+        entity1.setCurrency(currency);
 
         entityDTO1.setId(1L);
         entityDTO1.setName("myName1");
+        entityDTO1.setAddress(addressDTO);
+        entityDTO1.setCurrency(currencyDTO);
 
+        when(addressService.getById(address.getId())).thenReturn(Optional.of(address));
+        when(currencyService.getById(currency.getId())).thenReturn(Optional.of(currency));
         when(service.create(entity1)).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders
