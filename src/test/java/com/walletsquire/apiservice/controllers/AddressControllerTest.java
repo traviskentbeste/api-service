@@ -4,12 +4,9 @@ import com.walletsquire.apiservice.entities.Address;
 import com.walletsquire.apiservice.dtos.AddressDTO;
 import com.walletsquire.apiservice.mappers.AddressMapper;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
-import com.walletsquire.apiservice.services.AddressService;
+import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.walletsquire.apiservice.services.CurrencyService;
-import com.walletsquire.apiservice.services.PaidService;
-import com.walletsquire.apiservice.services.UserService;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Order;
@@ -83,6 +80,9 @@ public class AddressControllerTest {
 
     @MockBean
     CurrencyService currencyService;
+
+    @MockBean
+    CategoryService categoryService;
 
     /* entities/DTOs go here for testing */
     Address entity1 = new Address();

@@ -1,13 +1,9 @@
 package com.walletsquire.apiservice.controllers;
 
-import com.walletsquire.apiservice.dtos.PaidDTO;
-import com.walletsquire.apiservice.dtos.UserDTO;
-import com.walletsquire.apiservice.entities.Paid;
-import com.walletsquire.apiservice.entities.PaidUsers;
-import com.walletsquire.apiservice.dtos.PaidUsersDTO;
-import com.walletsquire.apiservice.entities.User;
-import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
-import com.walletsquire.apiservice.mappers.PaidUsersMapper;
+import com.walletsquire.apiservice.entities.Activity;
+import com.walletsquire.apiservice.dtos.ActivityDTO;
+import com.walletsquire.apiservice.entities.Category;
+import com.walletsquire.apiservice.mappers.ActivityMapper;
 import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,11 +29,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolationException;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,12 +44,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-@WebMvcTest( controllers = PaidUsersController.class )
-@ComponentScan(basePackageClasses = PaidUsersMapper.class)
+@WebMvcTest( controllers = ActivityController.class )
+@ComponentScan(basePackageClasses = ActivityMapper.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ActiveProfiles("dev")
 @TestMethodOrder(OrderAnnotation.class)
-public class PaidUsersControllerTest {
+public class ActivityControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -64,25 +58,19 @@ public class PaidUsersControllerTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    PaidUsersMapper mapper;
+    ActivityMapper mapper;
 
     @Autowired
-    PaidUsersController controller;
+    ActivityController controller;
 
     String endpoint = "/api/v1" + controller.endpoint;
 
     // mock objects
     @MockBean
-    PaidUsersService service;
-
-    @MockBean
-    CategoryMapperQualifier categoryMapperQualifier;
+    ActivityService service;
 
     @MockBean
     UserService userService;
-
-    @MockBean
-    PaidService paidService;
 
     @MockBean
     AddressService addressService;
@@ -94,10 +82,10 @@ public class PaidUsersControllerTest {
     CategoryService categoryService;
 
     /* entities/DTOs go here for testing */
-    PaidUsers entity1 = new PaidUsers();
-    PaidUsers entity2 = new PaidUsers();
-    PaidUsersDTO entityDTO1 = new PaidUsersDTO();
-    PaidUsersDTO entityDTO2 = new PaidUsersDTO();
+    Activity entity1 = new Activity();
+    Activity entity2 = new Activity();
+    ActivityDTO entityDTO1 = new ActivityDTO();
+    ActivityDTO entityDTO2 = new ActivityDTO();
 
     public String asJsonString(final Object obj) {
         try {
@@ -111,31 +99,11 @@ public class PaidUsersControllerTest {
     @Order(1)
     public void create() throws Exception {
 
-        Paid paid1 = new Paid();
-        paid1.setId(1L);
-
-        User user1 = new User();
-        user1.setId(1L);
-
-        PaidDTO paidDTO = new PaidDTO();
-        paidDTO.setId(1L);
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(1L);
-
         entity1.setId(1L);
-        entity1.setAmount(BigDecimal.valueOf(1));
-        entity1.setPaid(paid1);
-        entity1.setUser(user1);
+        entity1.setName("myName1");
 
         entityDTO1.setId(1L);
-        entityDTO1.setAmount(BigDecimal.valueOf(1));
-        entityDTO1.setPaid(paidDTO);
-        entityDTO1.setUser(userDTO);
-
-        when(paidService.getById(1L)).thenReturn(Optional.of(paid1));
-
-        when(userService.getById(1L)).thenReturn(Optional.of(user1));
+        entityDTO1.setName("myName1");
 
         when(service.create(entity1)).thenReturn(entity1);
 
@@ -157,7 +125,7 @@ public class PaidUsersControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.amount", equalTo(1)))
+                .andExpect(jsonPath("$.name", equalTo("myName1")))
                 .andDo(print())
                 ;
 
@@ -168,7 +136,7 @@ public class PaidUsersControllerTest {
     public void getById() throws Exception {
 
         entity1.setId(1L);
-        entity1.setAmount(BigDecimal.valueOf(1));
+        entity1.setName("myName1");
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
@@ -177,7 +145,7 @@ public class PaidUsersControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.amount", equalTo(1)));
+                .andExpect(jsonPath("$.name", equalTo("myName1")));
 
     }
 
@@ -185,9 +153,9 @@ public class PaidUsersControllerTest {
     @Order(3)
     public void getAll() throws Exception {
 
-        entity1.setAmount(BigDecimal.valueOf(1));
+        entity1.setName("myName1");
 
-        List<PaidUsers> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
+        List<Activity> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
 
         when(service.getAll()).thenReturn(entitys);
 
@@ -197,7 +165,7 @@ public class PaidUsersControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].amount", equalTo(1)));
+                .andExpect(jsonPath("$[0].name", equalTo("myName1")));
 
     }
 
@@ -205,35 +173,15 @@ public class PaidUsersControllerTest {
     @Order(4)
     public void update() throws Exception {
 
-        Paid paid1 = new Paid();
-        paid1.setId(1L);
-
-        User user1 = new User();
-        user1.setId(1L);
-
-        PaidDTO paidDTO = new PaidDTO();
-        paidDTO.setId(1L);
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(1L);
-
         entity1.setId(1L);
-        entity1.setAmount(BigDecimal.valueOf(1));
-        entity1.setPaid(paid1);
-        entity1.setUser(user1);
+        entity1.setName("myName1");
 
         entityDTO1.setId(1L);
-        entityDTO1.setAmount(BigDecimal.valueOf(1));
-        entityDTO1.setPaid(paidDTO);
-        entityDTO1.setUser(userDTO);
-
-        when(paidService.getById(1L)).thenReturn(Optional.of(paid1));
-
-        when(userService.getById(1L)).thenReturn(Optional.of(user1));
+        entityDTO1.setName("myName1");
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
-        when(service.update(entity1, entityDTO1, entity1.getId())).thenReturn(entity1);
+        when(service.update(entity1, entity1.getId())).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.put(endpoint + "/" + entityDTO1.getId() )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -243,7 +191,7 @@ public class PaidUsersControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.amount", is(1)));
+                .andExpect(jsonPath("$.name", is("myName1")));
 
     }
 
@@ -457,7 +405,7 @@ public class PaidUsersControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
-                .andExpect(result -> assertEquals("PaidUsers was not found for parameters {id=2}", result.getResolvedException().getMessage()));
+                .andExpect(result -> assertEquals("Activity was not found for parameters {id=2}", result.getResolvedException().getMessage()));
 
     }
 

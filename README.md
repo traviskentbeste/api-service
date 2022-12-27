@@ -9,6 +9,7 @@
 1. /api/v1/paid
 1. /api/v1/paid-users
 1. /api/v1/event
+1. /api/v1/activity
 
 # Notes
 

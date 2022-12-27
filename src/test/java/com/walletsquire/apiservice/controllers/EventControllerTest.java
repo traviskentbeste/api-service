@@ -89,6 +89,9 @@ public class EventControllerTest {
     @MockBean
     UserService userService;
 
+    @MockBean
+    CategoryService categoryService;
+
     /* entities/DTOs go here for testing */
     Event entity1 = new Event();
     Event entity2 = new Event();
@@ -199,11 +202,30 @@ public class EventControllerTest {
     @Order(4)
     public void update() throws Exception {
 
+        Address address = new Address();
+        address.setId(1L);
+
+        Currency currency = new Currency();
+        currency.setId(1L);
+
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setId(1L);
+
+        CurrencyDTO currencyDTO = new CurrencyDTO();
+        currencyDTO.setId(1L);
+
         entity1.setId(1L);
         entity1.setName("myName1");
+        entity1.setAddress(address);
+        entity1.setCurrency(currency);
 
         entityDTO1.setId(1L);
         entityDTO1.setName("myName1");
+        entityDTO1.setAddress(addressDTO);
+        entityDTO1.setCurrency(currencyDTO);
+
+        when(addressService.getById(address.getId())).thenReturn(Optional.of(address));
+        when(currencyService.getById(currency.getId())).thenReturn(Optional.of(currency));
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
