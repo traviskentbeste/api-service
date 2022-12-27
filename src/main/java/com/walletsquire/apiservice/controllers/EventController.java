@@ -39,39 +39,44 @@ public class EventController {
     @Autowired
     private EventMapper eventMapper;
 
+    private void validateEvent(Event event) {
+
+        // currency
+        if (event.getCurrency() == null) {
+            throw new EntityNotFoundException(Currency.class, "currency", "is null");
+        }
+        if (event.getCurrency().getId() == null) {
+            throw new EntityNotFoundException(Currency.class, "id", "is null");
+        }
+        Optional<Currency> currencyOptional = currencyService.getById(event.getCurrency().getId());
+        if (! currencyOptional.isPresent()) {
+            throw new EntityNotFoundException(Currency.class, "currency", "not found");
+        }
+        event.setCurrency(currencyOptional.get());
+
+        // address
+        if (event.getAddress() == null) {
+            throw new EntityNotFoundException(Address.class, "address", "is null");
+        }
+        if (event.getAddress().getId() == null) {
+            throw new EntityNotFoundException(Address.class, "id", "is null");
+        }
+        Optional<Address> addressOptional = addressService.getById(event.getAddress().getId());
+        if (! addressOptional.isPresent()) {
+            throw new EntityNotFoundException(Address.class, "address", "not found");
+        }
+        event.setAddress(addressOptional.get());
+
+    }
+
     @PostMapping(value = endpoint)
     public ResponseEntity<EventDTO> create(@Valid @RequestBody EventDTO eventDto) {
 
-        // only create if address exists
-        // only create if currency exits
-        if (eventDto.getAddress() != null) {
-            if (eventDto.getCurrency() != null) {
-                if (eventDto.getAddress().getId() != null) {
-                    if (eventDto.getCurrency().getId() != null) {
-                        Optional<Address> addressOptional = addressService.getById(eventDto.getAddress().getId());
-                        if (addressOptional.isPresent()) {
-                            Optional<Currency> currencyOptional = currencyService.getById(eventDto.getCurrency().getId());
-                            if (currencyOptional.isPresent()) {
-
-                                Event event = eventMapper.toEntity(eventDto);
-                                event = eventService.create(event);
-                                event.setAddress(addressOptional.get());
-                                event.setCurrency(currencyOptional.get());
-                                eventDto = eventMapper.toDto(event);
-                                return new ResponseEntity<>(eventDto , HttpStatus.CREATED);
-
-                            }
-                            throw new EntityNotFoundException(Currency.class, "id", "not found");
-                        }
-                        throw new EntityNotFoundException(Address.class, "id", "not found");
-                    }
-                    throw new EntityNotFoundException(Currency.class, "id", "is null");
-                }
-                throw new EntityNotFoundException(Address.class, "id", "is null");
-            }
-            throw new EntityNotFoundException(Currency.class, "currency", "object not found");
-        }
-        throw new EntityNotFoundException(Address.class, "address", "object not found");
+        Event event = eventMapper.toEntity(eventDto);
+        event = eventService.create(event);
+        validateEvent(event);
+        eventDto = eventMapper.toDto(event);
+        return new ResponseEntity<>(eventDto , HttpStatus.CREATED);
 
     }
 
