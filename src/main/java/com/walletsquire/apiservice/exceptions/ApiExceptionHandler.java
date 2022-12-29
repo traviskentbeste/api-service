@@ -188,6 +188,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
 
+        System.out.println("ex      : " + ex);
+        System.out.println("request : " + request);
         ApiError err = new ApiError(
                 HttpStatus.BAD_REQUEST,
                 "Error occurred" ,

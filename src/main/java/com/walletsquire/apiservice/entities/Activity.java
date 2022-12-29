@@ -7,7 +7,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
@@ -45,20 +46,20 @@ public class Activity extends BaseEntity {
     @OneToOne
     private Paid paidFor;
 
-    @Override
-    public String toString() {
-        return "Activity{" +
-                "id='" + this.getId() + '\'' +
-                ",name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", amount=" + amount +
-                ", splitType='" + splitType + '\'' +
-                ", event=" + event.getId() +
-                ", currency=" + currency.getId() +
-                ", address=" + address.getId() +
-                ", category=" + category.getId() +
-                ", paidBy=" + paidBy.getId() +
-                ", paidFor=" + paidFor.getId() +
-                "} ";
-    }
+//    @Override
+//    public String toString() {
+//        return "Activity{" +
+//                "id=" + this.getId() +
+//                ", name='" + name + '\'' +
+//                ", description='" + description + '\'' +
+//                ", amount=" + amount +
+//                ", splitType='" + splitType + '\'' +
+//                ", event=" + event.getId() +
+//                ", currency=" + currency.getId() +
+//                ", address=" + address.getId() +
+//                ", category=" + category.getId() +
+//                ", paidBy=" + paidBy.getId() +
+//                ", paidFor=" + paidFor.getId() +
+//                "} " + super.toString();
+//    }
 }

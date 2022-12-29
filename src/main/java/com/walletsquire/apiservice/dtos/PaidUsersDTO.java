@@ -1,16 +1,11 @@
 package com.walletsquire.apiservice.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaidUsersDTO {
@@ -20,7 +15,25 @@ public class PaidUsersDTO {
     private BigDecimal amount;
 
     private PaidDTO paid;
-
     private UserDTO user;
 
+    @Override
+    public String toString() {
+
+        String str = "PaidUsersDTO{" +
+                "id=" + id +
+                ", amount=" + amount;
+        if (paid != null) {
+            str += ", paid=" + paid.getId();
+        } else {
+            str += ", paid=null";
+        }
+        if (user != null) {
+            str += ", user=" + user.getId();
+        } else {
+            str += ", user=null";
+        }
+        str += '}';
+        return str;
+    }
 }

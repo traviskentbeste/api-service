@@ -7,7 +7,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
@@ -27,11 +28,22 @@ public class PaidUsers extends BaseEntity {
 
     @Override
     public String toString() {
-        return "PaidUsers{" +
-                "id=" + amount +
-                ", amount=" + amount +
-                ", user=" + user +
-                ", paid=" + paid +
-                "} ";
+
+        String str = "PaidUsers{" +
+                "id=" + this.getId() +
+                ", amount=" + amount;
+        if (paid != null) {
+            str += ", paid.id=" + paid.getId();
+        } else {
+            str += ", paid=null";
+        }
+        if (user != null) {
+            str += ", user.id=" + user.getId();
+        } else {
+            str += ", user=null";
+        }
+        str += "} ";
+
+        return str;
     }
 }

@@ -2,47 +2,45 @@ package com.walletsquire.apiservice.mappers;
 
 import com.walletsquire.apiservice.dtos.PaidDTO;
 import com.walletsquire.apiservice.dtos.PaidUsersDTO;
-import com.walletsquire.apiservice.dtos.UserDTO;
 import com.walletsquire.apiservice.entities.Paid;
 import com.walletsquire.apiservice.entities.PaidUsers;
-import com.walletsquire.apiservice.entities.User;
-import com.walletsquire.apiservice.services.PaidService;
-import com.walletsquire.apiservice.services.UserService;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
-import java.util.Optional;
-
 @Mapper(
-        unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE,
-        componentModel = "spring"
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
-public abstract class PaidUsersMapper {
+public interface PaidUsersMapper {
 
-    @Autowired
-    private UserMapper userMapper;
+    PaidUsersMapper INSTANCE = Mappers.getMapper(PaidUsersMapper.class);
 
-    @Autowired
-    private UserService userService;
+    PaidUsers toEntity(PaidUsersDTO paidUsersDto);
 
-    public abstract PaidUsers toEntity(PaidUsersDTO paidUsersDto);
+    PaidUsersDTO toDto(PaidUsers paidUsers);
 
-    public abstract PaidUsersDTO toDto(PaidUsers paidUsers);
+    // expression = "java(new PaidDTO().builder().id(paidUsers.getPaid().getId()).type(paidUsers.getPaid().getType()).hasExtraPenny(paidUsers.getPaid().getHasExtraPenny()).calculatedSplitAmount(paidUsers.getPaid().getCalculatedSplitAmount()).build())")
+    @Mappings({
+            @Mapping(target = "paid", source="paidUsers.paid", qualifiedByName = "processPaid")
+    })
+    PaidUsersDTO toDtoWithoutPaid(PaidUsers paidUsers);
 
-    public User mapUser(UserDTO obj) {
-//        System.out.println("mapUser is    : " + obj.getId());
-        Optional<User> optional = userService.getById(obj.getId());
-        if (optional.isPresent()) {
-//            System.out.println("returning : " + optional.get());
-            return optional.get();
+    @Named("processPaid")
+    default PaidDTO processPaid(Paid paid) {
+//        System.out.println("processPaid");
+        if (paid != null) {
+//            System.out.println("    paid is not null");
+            PaidDTO paidDTO = new PaidDTO().builder()
+                    .id(paid.getId())
+                    .type(paid.getType())
+                    .hasExtraPenny(paid.getHasExtraPenny())
+                    .calculatedSplitAmount(paid.getCalculatedSplitAmount())
+                    .build();
+            return paidDTO;
         }
+//        System.out.println("    paid is null");
+
         return null;
     }
-
-    public UserDTO mapUserDTO(User obj) {
-//        System.out.println("mapUserDTO is : " + obj);
-        return userMapper.toDto(obj);
-    }
-
 }

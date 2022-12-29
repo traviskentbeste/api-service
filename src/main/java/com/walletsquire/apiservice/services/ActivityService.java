@@ -1,10 +1,15 @@
 package com.walletsquire.apiservice.services;
 
+import com.walletsquire.apiservice.dtos.ActivitySummaryCreditorDTO;
+import com.walletsquire.apiservice.dtos.ActivitySummaryDebitorsDTO;
 import com.walletsquire.apiservice.entities.Activity;
+import com.walletsquire.apiservice.entities.PaidUsers;
 import com.walletsquire.apiservice.repositories.ActivityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,5 +101,71 @@ public class ActivityService {
         }
 
     }
+
+    public List<ActivitySummaryDebitorsDTO> getDebitors(Activity activity) {
+
+        // this is going to be the return object - so we'll build it up and then return it as updates from the database and applied buisiness logic
+        List<ActivitySummaryDebitorsDTO> debitors = new ArrayList<>();
+
+//        removeAllForsThatMatchBys(debitors, activity);
+//        createDebitors(debitors, activity);
+
+        return debitors;
+    }
+
+
+//    private void removeAllForsThatMatchBys(List<ActivitySummaryDebitorsDTO> debitors, Activity activity) {
+//        int debug = 0;
+//
+//        // remove all fors that match the by's
+//        List<PaidUsers> paidForsToRemove = new ArrayList<>();
+//        for( PaidUsers paidFor : activity.getPaidFor().getPaidUsers()) {
+//            if (debug == 1) {
+//                System.out.printf("for %10s(%3d) -> %.2f\n", paidFor.getUser().getFirstName(), paidFor.getUser().getId(), paidFor.getAmount());
+//            }
+//            for( PaidUsers paidBy : activity.getPaidBy().getPaidUsers()) {
+//                if (debug == 1) {
+//                    System.out.printf("    - by %10s(%3d) -> %.2f\n", paidBy.getUser().getFirstName(), paidBy.getUser().getId(), paidBy.getAmount());
+//                }
+//                if (paidBy.getUser().getId().equals(paidFor.getUser().getId())) {
+//                    paidBy.setAmount(paidBy.getAmount().subtract(paidFor.getAmount()));
+//                    paidForsToRemove.add(paidFor);
+//                }
+//            }
+//        }
+//        activity.getPaidFor().getPaidUsers().removeAll(paidForsToRemove);
+//
+//    }
+//
+//    private void createDebitors(List<ActivitySummaryDebitorsDTO> debitors, Activity activity) {
+//        int debug = 0;
+//
+//        for( PaidUsers paidFor : activity.getPaidFor().getPaidUsers()) {
+//            if (debug == 1) {
+//                System.out.printf("for %10s(%3d) -> %.2f\n", paidFor.getUser().getFirstName(), paidFor.getUser().getId(), paidFor.getAmount());
+//            }
+//            ActivitySummaryDebitorsDTO activitySummaryDebitorsDTO = new ActivitySummaryDebitorsDTO();
+//            activitySummaryDebitorsDTO.setUser(paidFor.getUser().getId());
+//            activitySummaryDebitorsDTO.setTotal(paidFor.getAmount());
+//
+//            for( PaidUsers paidBy : activity.getPaidBy().getPaidUsers()) {
+//                if (debug == 1) {
+//                    System.out.printf("    - by %10s(%3d) -> %.2f\n", paidBy.getUser().getFirstName(), paidBy.getUser().getId(), paidBy.getAmount());
+//                }
+//
+//                ActivitySummaryCreditorDTO activitySummaryCreditorDTO = new ActivitySummaryCreditorDTO();
+//
+//                activitySummaryCreditorDTO.setUser(paidBy.getUser().getId());
+//                if (debug == 1) {
+//                    System.out.println("         amount(paidFor.amount) : " + paidFor.getAmount() + " divided by " + activity.getPaidBy().getPaidUsers().size());
+//                }
+//                activitySummaryCreditorDTO.setAmount(paidFor.getAmount().divide(BigDecimal.valueOf(activity.getPaidBy().getPaidUsers().size())));
+//
+//                activitySummaryDebitorsDTO.addCreditor(activitySummaryCreditorDTO);
+//            }
+//
+//            debitors.add(activitySummaryDebitorsDTO);
+//        }
+//    }
 
 }

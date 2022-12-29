@@ -1,19 +1,11 @@
 package com.walletsquire.apiservice.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaidDTO {
@@ -22,8 +14,5 @@ public class PaidDTO {
     private BigDecimal calculatedSplitAmount;
     private Boolean hasExtraPenny;
     private String type;
-
-//    @JsonIgnore
-//    private Set<PaidUsersDTO> paidUsers = new HashSet<>();
 
 }

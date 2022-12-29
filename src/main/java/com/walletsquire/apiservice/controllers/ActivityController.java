@@ -1,6 +1,7 @@
 package com.walletsquire.apiservice.controllers;
 
 import com.walletsquire.apiservice.dtos.ActivityDTO;
+import com.walletsquire.apiservice.dtos.ActivitySummaryDTO;
 import com.walletsquire.apiservice.entities.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.walletsquire.apiservice.mappers.ActivityMapper;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -200,6 +202,28 @@ public class ActivityController {
         // response
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
 
+    }
+
+    @GetMapping("/event/{eventId}/activity/{activityId}/summary")
+    public ResponseEntity<ActivitySummaryDTO> summary(@PathVariable @Min(1) Long eventId, @PathVariable @Min(1) Long activityId) {
+
+        Optional<Event> eventEntityOptional = eventService.getById(eventId);
+        if (! eventEntityOptional.isPresent()) {
+            throw new EntityNotFoundException(Event.class, "id", eventId.toString());
+        }
+
+        Optional<Activity> activityEntityOptional = activityService.getById(activityId);
+        if (! activityEntityOptional.isPresent()) {
+            throw new EntityNotFoundException(Activity.class, "id", activityId.toString());
+        }
+
+        Activity activity = activityEntityOptional.get();
+
+        ActivitySummaryDTO activitySummaryDTO = new ActivitySummaryDTO();
+        activitySummaryDTO.setAmount(activity.getAmount());
+        activitySummaryDTO.setDebitors(activityService.getDebitors(activityEntityOptional.get()));
+
+        return new ResponseEntity<>(activitySummaryDTO, HttpStatus.OK);
     }
 
 }
