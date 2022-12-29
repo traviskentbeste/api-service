@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,9 +33,13 @@ public class PaidController {
     @PostMapping(value = endpoint)
     public ResponseEntity<PaidDTO> create(@Valid @RequestBody PaidDTO paidDto) {
 
+//        System.out.println("1.  paidDto : " + paidDto);
         Paid paid = paidMapper.toEntity(paidDto);
+//        System.out.println("2.  paid    : " + paid);
         paid = paidService.create(paid);
+//        System.out.println("3.  paid    : " + paid);
         paidDto = paidMapper.toDto(paid);
+//        System.out.println("4.  paidDto : " + paidDto);
         return new ResponseEntity<>(paidDto , HttpStatus.CREATED);
 
     }

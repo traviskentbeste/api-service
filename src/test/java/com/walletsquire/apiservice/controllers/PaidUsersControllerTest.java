@@ -7,14 +7,18 @@ import com.walletsquire.apiservice.entities.PaidUsers;
 import com.walletsquire.apiservice.dtos.PaidUsersDTO;
 import com.walletsquire.apiservice.entities.User;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
+import com.walletsquire.apiservice.mappers.PaidMapper;
 import com.walletsquire.apiservice.mappers.PaidUsersMapper;
+import com.walletsquire.apiservice.mappers.UserMapper;
 import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.cucumber.java.hu.Ha;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,15 +38,13 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import javax.validation.ConstraintViolationException;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -93,6 +95,12 @@ public class PaidUsersControllerTest {
     @MockBean
     CategoryService categoryService;
 
+    @MockBean
+    PaidMapper paidMapper;
+
+    @MockBean
+    UserMapper userMapper;
+
     /* entities/DTOs go here for testing */
     PaidUsers entity1 = new PaidUsers();
     PaidUsers entity2 = new PaidUsers();
@@ -134,7 +142,6 @@ public class PaidUsersControllerTest {
         entityDTO1.setUser(userDTO);
 
         when(paidService.getById(1L)).thenReturn(Optional.of(paid1));
-
         when(userService.getById(1L)).thenReturn(Optional.of(user1));
 
         when(service.create(entity1)).thenReturn(entity1);
@@ -170,6 +177,9 @@ public class PaidUsersControllerTest {
         entity1.setId(1L);
         entity1.setAmount(BigDecimal.valueOf(1));
 
+        entityDTO1.setId(1L);
+        entityDTO1.setAmount(BigDecimal.valueOf(1));
+
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -186,6 +196,9 @@ public class PaidUsersControllerTest {
     public void getAll() throws Exception {
 
         entity1.setAmount(BigDecimal.valueOf(1));
+
+        entityDTO1.setId(1L);
+        entityDTO1.setAmount(BigDecimal.valueOf(1));
 
         List<PaidUsers> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
 
@@ -205,35 +218,15 @@ public class PaidUsersControllerTest {
     @Order(4)
     public void update() throws Exception {
 
-        Paid paid1 = new Paid();
-        paid1.setId(1L);
-
-        User user1 = new User();
-        user1.setId(1L);
-
-        PaidDTO paidDTO = new PaidDTO();
-        paidDTO.setId(1L);
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(1L);
-
         entity1.setId(1L);
         entity1.setAmount(BigDecimal.valueOf(1));
-        entity1.setPaid(paid1);
-        entity1.setUser(user1);
 
         entityDTO1.setId(1L);
         entityDTO1.setAmount(BigDecimal.valueOf(1));
-        entityDTO1.setPaid(paidDTO);
-        entityDTO1.setUser(userDTO);
 
-        when(paidService.getById(1L)).thenReturn(Optional.of(paid1));
+        when(service.getById(1L)).thenReturn(Optional.of(entity1));
 
-        when(userService.getById(1L)).thenReturn(Optional.of(user1));
-
-        when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
-
-        when(service.update(entity1, entityDTO1, entity1.getId())).thenReturn(entity1);
+        when(service.update(any(PaidUsers.class), any(PaidUsersDTO.class), any(Long.class))).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.put(endpoint + "/" + entityDTO1.getId() )
                 .contentType(MediaType.APPLICATION_JSON)

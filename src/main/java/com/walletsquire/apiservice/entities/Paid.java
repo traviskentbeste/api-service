@@ -5,12 +5,10 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
@@ -22,18 +20,17 @@ public class Paid extends BaseEntity {
     private Boolean hasExtraPenny;
     private String type;
 
-//    @OneToMany(cascade=CascadeType.ALL, orphanRemoval=true)
-//    @JoinColumn(name="paid_id")
-//    private Set<PaidUsers> paidUsers = new HashSet<>();
+    @OneToMany(mappedBy = "paid", cascade=CascadeType.ALL, orphanRemoval=true)
+    private Set<PaidUsers> paidUsers = new HashSet<>();
 
     @Override
     public String toString() {
         return "Paid{" +
-                "id=" + this.getId() +
+                "id='" + this.getId() + '\'' +
                 ", calculatedSplitAmount=" + calculatedSplitAmount +
                 ", hasExtraPenny=" + hasExtraPenny +
                 ", type='" + type + '\'' +
-//                ", paidUsers=" + paidUsers +
-                "} ";
+                ", paidUsers.size()=" + paidUsers.size() +
+                "} " + super.toString();
     }
 }

@@ -1,8 +1,7 @@
 package com.walletsquire.apiservice.controllers;
 
-import com.walletsquire.apiservice.entities.Activity;
-import com.walletsquire.apiservice.dtos.ActivityDTO;
-import com.walletsquire.apiservice.entities.Category;
+import com.walletsquire.apiservice.dtos.*;
+import com.walletsquire.apiservice.entities.*;
 import com.walletsquire.apiservice.mappers.ActivityMapper;
 import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
@@ -23,7 +22,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -32,6 +30,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,6 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @WebMvcTest( controllers = ActivityController.class )
 @ComponentScan(basePackageClasses = ActivityMapper.class)
@@ -81,6 +82,12 @@ public class ActivityControllerTest {
     @MockBean
     CategoryService categoryService;
 
+    @MockBean
+    EventService eventService;
+
+    @MockBean
+    PaidService paidService;
+
     /* entities/DTOs go here for testing */
     Activity entity1 = new Activity();
     Activity entity2 = new Activity();
@@ -99,13 +106,68 @@ public class ActivityControllerTest {
     @Order(1)
     public void create() throws Exception {
 
+        Event event = new Event();
+        event.setId(1L);
+
+        EventDTO eventDTO = new EventDTO();
+        eventDTO.setId(1L);
+
+        Currency currency = new Currency();
+        currency.setId(1L);
+
+        CurrencyDTO currencyDTO = new CurrencyDTO();
+        currencyDTO.setId(1L);
+
+        Address address = new Address();
+        address.setId(1L);
+
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setId(1L);
+
+        Category category = new Category();
+        category.setId(1L);
+
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setId(1L);
+
+        Paid paidBy = new Paid();
+        paidBy.setId(1L);
+
+        PaidDTO paidByDTO = new PaidDTO();
+        paidByDTO.setId(1L);
+
+        Paid paidFor = new Paid();
+        paidFor.setId(1L);
+
+        PaidDTO paidForDTO = new PaidDTO();
+        paidForDTO.setId(1L);
+
         entity1.setId(1L);
         entity1.setName("myName1");
+        entity1.setEvent(event);
+        entity1.setCurrency(currency);
+        entity1.setAddress(address);
+        entity1.setCategory(category);
+        entity1.setPaidBy(paidBy);
+        entity1.setPaidFor(paidFor);
 
         entityDTO1.setId(1L);
         entityDTO1.setName("myName1");
+        entityDTO1.setEvent(eventDTO);
+        entityDTO1.setCurrency(currencyDTO);
+        entityDTO1.setAddress(addressDTO);
+        entityDTO1.setCategory(categoryDTO);
+        entityDTO1.setPaidBy(paidByDTO);
+        entityDTO1.setPaidFor(paidForDTO);
 
-        when(service.create(entity1)).thenReturn(entity1);
+        when(eventService.getById(any(Long.class))).thenReturn(Optional.of(event));
+        when(currencyService.getById(any(Long.class))).thenReturn(Optional.of(currency));
+        when(addressService.getById(any(Long.class))).thenReturn(Optional.of(address));
+        when(categoryService.getById(any(Long.class))).thenReturn(Optional.of(category));
+        when(paidService.getById(any(Long.class))).thenReturn(Optional.of(paidBy));
+        when(paidService.getById(any(Long.class))).thenReturn(Optional.of(paidFor));
+
+        when(service.create(any(Activity.class))).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders
                 .post(endpoint)
@@ -113,14 +175,6 @@ public class ActivityControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(asJsonString(entityDTO1))
                 ;
-
-//         use this to print out the content
-//        MvcResult result = mockMvc.perform(mockHttpServletRequestBuilder)
-//                .andExpect(status().isCreated())
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//        String content = result.getResponse().getContentAsString();
-//        System.out.println("content : ->" + content + "<-");
 
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isCreated())
@@ -173,11 +227,62 @@ public class ActivityControllerTest {
     @Order(4)
     public void update() throws Exception {
 
+        Event event = new Event();
+        event.setId(1L);
+        EventDTO eventDTO = new EventDTO();
+        eventDTO.setId(1L);
+
+        Currency currency = new Currency();
+        currency.setId(1L);
+        CurrencyDTO currencyDTO = new CurrencyDTO();
+        currencyDTO.setId(1L);
+
+        Address address = new Address();
+        address.setId(1L);
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setId(1L);
+
+        Category category = new Category();
+        category.setId(1L);
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setId(1L);
+
+        Paid paidBy = new Paid();
+        paidBy.setId(1L);
+
+        PaidDTO paidByDTO = new PaidDTO();
+        paidByDTO.setId(1L);
+
+        Paid paidFor = new Paid();
+        paidFor.setId(1L);
+
+        PaidDTO paidForDTO = new PaidDTO();
+        paidForDTO.setId(1L);
+
         entity1.setId(1L);
         entity1.setName("myName1");
+        entity1.setEvent(event);
+        entity1.setCurrency(currency);
+        entity1.setAddress(address);
+        entity1.setCategory(category);
+        entity1.setPaidBy(paidBy);
+        entity1.setPaidFor(paidFor);
 
         entityDTO1.setId(1L);
         entityDTO1.setName("myName1");
+        entityDTO1.setEvent(eventDTO);
+        entityDTO1.setCurrency(currencyDTO);
+        entityDTO1.setAddress(addressDTO);
+        entityDTO1.setCategory(categoryDTO);
+        entityDTO1.setPaidBy(paidByDTO);
+        entityDTO1.setPaidFor(paidForDTO);
+
+        when(eventService.getById(event.getId())).thenReturn(Optional.of(event));
+        when(currencyService.getById(currency.getId())).thenReturn(Optional.of(currency));
+        when(addressService.getById(address.getId())).thenReturn(Optional.of(address));
+        when(categoryService.getById(category.getId())).thenReturn(Optional.of(category));
+        when(paidService.getById(paidBy.getId())).thenReturn(Optional.of(paidBy));
+        when(paidService.getById(paidFor.getId())).thenReturn(Optional.of(paidFor));
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 

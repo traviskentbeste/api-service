@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -46,6 +45,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @WebMvcTest( controllers = UserController.class )
 @ComponentScan(basePackageClasses = UserMapper.class)
@@ -108,7 +109,7 @@ public class UserControllerTest {
         entityDTO1.setId(1L);
         entityDTO1.setFirstName("myName1");
 
-        when(service.create(entity1)).thenReturn(entity1);
+        when(service.create(any(User.class))).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders
                 .post(endpoint)
@@ -184,7 +185,7 @@ public class UserControllerTest {
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
-        when(service.update(entity1, entity1.getId())).thenReturn(entity1);
+        when(service.update(any(User.class), any(Long.class))).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.put(endpoint + "/" + entityDTO1.getId() )
                 .contentType(MediaType.APPLICATION_JSON)

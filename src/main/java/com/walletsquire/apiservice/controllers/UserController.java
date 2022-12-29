@@ -35,6 +35,7 @@ public class UserController {
         User user = userMapper.toEntity(userDto);
         user = userService.create(user);
         userDto = userMapper.toDto(user);
+
         return new ResponseEntity<>(userDto , HttpStatus.CREATED);
 
     }

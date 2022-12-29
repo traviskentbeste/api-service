@@ -7,6 +7,7 @@ import com.walletsquire.apiservice.entities.Category;
 import com.walletsquire.apiservice.services.AddressService;
 import com.walletsquire.apiservice.services.CategoryService;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +26,7 @@ public abstract class ActivityMapper {
     CategoryService categoryService;
 
     public abstract Activity toEntity(ActivityDTO activityDto);
-    
+
     public abstract ActivityDTO toDto(Activity activity);
 
     public Address mapLongToAddress(Long value) {
