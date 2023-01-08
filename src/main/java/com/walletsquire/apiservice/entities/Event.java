@@ -29,7 +29,7 @@ public class Event extends BaseEntity {
     @OneToOne
     private Currency currency;
 
-//    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-//    private List<Activity> activities = new ArrayList<>();
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    private List<Activity> activities = new ArrayList<>();
 
 }
