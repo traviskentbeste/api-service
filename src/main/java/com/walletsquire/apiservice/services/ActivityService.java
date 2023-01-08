@@ -110,12 +110,16 @@ public class ActivityService {
     }
 
     public List<ActivitySummaryDebitorsDTO> getDebitors(Activity activity) {
+        int debug = 0;
 
         // this is going to be the return object - so we'll build it up and then return it as updates from the database and applied buisiness logic
         List<ActivitySummaryDebitorsDTO> debitors = new ArrayList<>();
 
         removeAllForsThatMatchBys(debitors, activity);
-        createDebitors(debitors, activity);
+        if (debug == 1) {
+            System.out.println("--------------------------------------------------------------------------------");
+        }
+        createDebitorsFromRemaining(debitors, activity);
 
         return debitors;
     }
@@ -126,15 +130,18 @@ public class ActivityService {
 
         // remove all fors that match the by's
         List<PaidUsers> paidForsToRemove = new ArrayList<>();
-        for( PaidUsers paidFor : activity.getPaidFor().getPaidUsers()) {
+        for( PaidUsers paidFor : activity.getPaidFor().getPaidUsers() ) {
             if (debug == 1) {
-                System.out.printf("for %10s(%3d) -> %.2f\n", paidFor.getUser().getFirstName(), paidFor.getUser().getId(), paidFor.getAmount());
+                System.out.printf("removeAllForsThatMatchBys   - for %10s(%3d)\n", paidFor.getUser().getFirstName(), paidFor.getUser().getId());
             }
-            for( PaidUsers paidBy : activity.getPaidBy().getPaidUsers()) {
+            for( PaidUsers paidBy : activity.getPaidBy().getPaidUsers() ) {
                 if (debug == 1) {
-                    System.out.printf("    - by %10s(%3d) -> %.2f\n", paidBy.getUser().getFirstName(), paidBy.getUser().getId(), paidBy.getAmount());
+                    System.out.printf("removeAllForsThatMatchBys   -     - (%3d) - by %10s(%3d)\n", paidFor.getUser().getId(), paidBy.getUser().getFirstName(), paidBy.getUser().getId());
                 }
                 if (paidBy.getUser().getId().equals(paidFor.getUser().getId())) {
+                    if (debug == 1) {
+                        System.out.printf("removeAllForsThatMatchBys   -             - removing %d because paidBy <=> paidFor\n", paidFor.getUser().getId());
+                    }
                     paidBy.setAmount(paidBy.getAmount().subtract(paidFor.getAmount()));
                     paidForsToRemove.add(paidFor);
                 }
@@ -144,30 +151,33 @@ public class ActivityService {
 
     }
 
-    private void createDebitors(List<ActivitySummaryDebitorsDTO> debitors, Activity activity) {
+    private void createDebitorsFromRemaining(List<ActivitySummaryDebitorsDTO> debitors, Activity activity) {
         int debug = 0;
+
+        int paidByPaidUsersSize = activity.getPaidBy().getPaidUsers().size();
 
         for( PaidUsers paidFor : activity.getPaidFor().getPaidUsers() ) {
             if (debug == 1) {
-                System.out.printf("for %10s(%3d) -> %.2f\n", paidFor.getUser().getFirstName(), paidFor.getUser().getId(), paidFor.getAmount());
+                System.out.printf("createDebitorsFromRemaining - for %10s(%3d) -> %.2f\n", paidFor.getUser().getFirstName(), paidFor.getUser().getId(), paidFor.getAmount());
             }
+
+            // create the summaryDebtorsDTO
             ActivitySummaryDebitorsDTO activitySummaryDebitorsDTO = new ActivitySummaryDebitorsDTO();
             activitySummaryDebitorsDTO.setUser(userMapper.toDto(paidFor.getUser()));
             activitySummaryDebitorsDTO.setTotal(paidFor.getAmount());
 
-            for( PaidUsers paidBy : activity.getPaidBy().getPaidUsers()) {
+            for( PaidUsers paidBy : activity.getPaidBy().getPaidUsers() ) {
+
                 if (debug == 1) {
-                    System.out.printf("    - by %10s(%3d) -> %.2f\n", paidBy.getUser().getFirstName(), paidBy.getUser().getId(), paidBy.getAmount());
+                    System.out.printf("createDebitorsFromRemaining -     - (%3d) - by %10s(%3d) - %5.2f\n", paidFor.getUser().getId(), paidBy.getUser().getFirstName(), paidBy.getUser().getId(), paidFor.getAmount().divide(BigDecimal.valueOf(paidByPaidUsersSize)));
                 }
 
+                // create the summaryCreditorDTO
                 ActivitySummaryCreditorDTO activitySummaryCreditorDTO = new ActivitySummaryCreditorDTO();
+                activitySummaryCreditorDTO.setUser(userMapper.toDto(paidBy.getUser()));
+                activitySummaryCreditorDTO.setAmount(paidFor.getAmount().divide(BigDecimal.valueOf(paidByPaidUsersSize)));
 
-                activitySummaryCreditorDTO.setUser(userMapper.toDto(paidFor.getUser()));
-                if (debug == 1) {
-                    System.out.println("         amount(paidFor.amount) : " + paidFor.getAmount() + " divided by " + activity.getPaidBy().getPaidUsers().size());
-                }
-                activitySummaryCreditorDTO.setAmount(paidFor.getAmount().divide(BigDecimal.valueOf(activity.getPaidBy().getPaidUsers().size())));
-
+                // add creditor
                 activitySummaryDebitorsDTO.addCreditor(activitySummaryCreditorDTO);
             }
 
