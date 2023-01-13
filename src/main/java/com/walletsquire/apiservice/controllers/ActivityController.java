@@ -137,6 +137,29 @@ public class ActivityController {
 
     }
 
+    @PostMapping(value = "/event/{id}" + endpoint)
+    public ResponseEntity<ActivityDTO> create(@PathVariable("id") @Min(1) Long id, @Valid @RequestBody ActivityDTO activityDTO) {
+
+        // validate the event first
+        Optional<Event> eventOptional = eventService.getById(id);
+
+        if (!eventOptional.isPresent()) {
+            throw new EntityNotFoundException(Event.class, "id", id.toString());
+        }
+
+        Activity activity = activityMapper.toEntity(activityDTO);
+        activity.setEvent(eventOptional.get());
+
+        // handles 'sub' objects and throw errors if it exists
+        validateActivity(activity);
+
+        activity = activityService.create(activity);
+        activityDTO = activityMapper.toDto(activity);
+        return new ResponseEntity<>(activityDTO , HttpStatus.CREATED);
+
+    }
+
+
     @GetMapping(value = endpoint + "/{id}")
     public ResponseEntity<ActivityDTO> getById(@PathVariable("id") @Min(1) Long id) {
 
