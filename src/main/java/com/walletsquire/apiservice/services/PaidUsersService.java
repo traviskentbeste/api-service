@@ -115,4 +115,10 @@ public class PaidUsersService {
 
     }
 
+    public List<PaidUsers> getAllPaidUsers(Paid paid) {
+
+        return paidUsersRepository.getPaidUsersByPaid(paid);
+
+    }
+
 }
