@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: api-service
-        image: registry.tencorners.com/api-service:v0.0.1
+        image: registry.tencorners.com/api-service:0.0.1
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
