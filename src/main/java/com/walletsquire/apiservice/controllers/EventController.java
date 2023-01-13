@@ -178,6 +178,28 @@ public class EventController {
 
     }
 
+    @GetMapping(endpoint + "/{id}/activities")
+    public List<ActivityDTO> activities(@PathVariable @Min(1) Long id) {
+        int debug = 0;
+
+        Optional<Event> eventEntityOptional = eventService.getById(id);
+
+        if (eventEntityOptional.isPresent()) {
+
+            Event event = eventEntityOptional.get();
+            if (debug == 1) {
+                System.out.println("event : " + event);
+            }
+
+            return eventService.getAllActivities(event).stream().map(activity -> {
+                return activityMapper.toDto(activity);
+            }).collect(Collectors.toList());
+
+        }
+
+        return new ArrayList<>();
+    }
+
     @GetMapping(endpoint + "/{id}/summary")
     public ResponseEntity<EventSummaryDTO> summary(@PathVariable @Min(1) Long id) {
         int debug = 1;
