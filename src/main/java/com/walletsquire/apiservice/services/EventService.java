@@ -3,10 +3,8 @@ package com.walletsquire.apiservice.services;
 import com.walletsquire.apiservice.dtos.ActivitySummaryCreditorDTO;
 import com.walletsquire.apiservice.dtos.ActivitySummaryDebitorsDTO;
 import com.walletsquire.apiservice.dtos.UserDTO;
-import com.walletsquire.apiservice.entities.Address;
-import com.walletsquire.apiservice.entities.Currency;
-import com.walletsquire.apiservice.entities.Event;
-import com.walletsquire.apiservice.entities.User;
+import com.walletsquire.apiservice.entities.*;
+import com.walletsquire.apiservice.repositories.ActivityRepository;
 import com.walletsquire.apiservice.repositories.AddressRepository;
 import com.walletsquire.apiservice.repositories.CurrencyRepository;
 import com.walletsquire.apiservice.repositories.EventRepository;
@@ -23,6 +21,8 @@ public class EventService {
 
     @Autowired
     private EventRepository eventRepository;
+    @Autowired
+    private ActivityRepository activityRepository;
 
     public Event create(Event event) {
 
@@ -91,6 +91,12 @@ public class EventService {
         if (eventOptional.isPresent()) {
             eventRepository.delete(eventOptional.get());
         }
+
+    }
+
+    public List<Activity> getAllActivities(Event event) {
+
+        return activityRepository.getActivitiesByEvent(event);
 
     }
 
