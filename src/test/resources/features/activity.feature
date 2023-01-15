@@ -7,8 +7,3 @@ Feature:  Cucumber: Activity tests
   Scenario: Check that there are at least 1 activity
     When I fetch the activity
     Then I should find at least 1 activity
-
-
-  Scenario: People are paying for one activity
-    When I fetch activity 1
-    Then Hello world

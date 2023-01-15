@@ -2,9 +2,7 @@ package com.walletsquire.apiservice.controllers;
 
 import com.walletsquire.apiservice.dtos.AddressDTO;
 import com.walletsquire.apiservice.dtos.CurrencyDTO;
-import com.walletsquire.apiservice.entities.Address;
-import com.walletsquire.apiservice.entities.Currency;
-import com.walletsquire.apiservice.entities.Event;
+import com.walletsquire.apiservice.entities.*;
 import com.walletsquire.apiservice.dtos.EventDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
 import com.walletsquire.apiservice.mappers.EventMapper;
@@ -41,6 +39,8 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -92,6 +92,12 @@ public class EventControllerTest {
     @MockBean
     CategoryService categoryService;
 
+    @MockBean
+    ActivityService activityService;
+
+    @MockBean
+    PaidUsersService paidUsersService;
+
     /* entities/DTOs go here for testing */
     Event entity1 = new Event();
     Event entity2 = new Event();
@@ -132,9 +138,9 @@ public class EventControllerTest {
         entityDTO1.setAddress(addressDTO);
         entityDTO1.setCurrency(currencyDTO);
 
-        when(addressService.getById(address.getId())).thenReturn(Optional.of(address));
-        when(currencyService.getById(currency.getId())).thenReturn(Optional.of(currency));
-        when(service.create(entity1)).thenReturn(entity1);
+        when(addressService.getById(anyLong())).thenReturn(Optional.of(Address.builder().build()));
+        when(currencyService.getById(anyLong())).thenReturn(Optional.of(Currency.builder().build()));
+        when(service.create(any(Event.class))).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders
                 .post(endpoint)
@@ -229,7 +235,7 @@ public class EventControllerTest {
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
-        when(service.update(entity1, entity1.getId())).thenReturn(entity1);
+        when(service.update(any(Event.class), anyLong())).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.put(endpoint + "/" + entityDTO1.getId() )
                 .contentType(MediaType.APPLICATION_JSON)

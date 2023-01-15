@@ -84,6 +84,9 @@ public class PaidControllerTest {
     @MockBean
     CategoryService categoryService;
 
+    @MockBean
+    PaidUsersService paidUsersService;
+
     /* entities/DTOs go here for testing */
     Paid entity1 = new Paid();
     Paid entity2 = new Paid();
