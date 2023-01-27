@@ -107,27 +107,39 @@ public class EventService {
             if (debug == 1) {
                 System.out.println("debitor : " + debitor.getUser());
             }
-
             for (ActivitySummaryCreditorDTO creditor : debitor.getCreditors()) {
                 if (debug == 1) {
                     System.out.println("  - creditor : " + creditor.getUser() + " amount : " + creditor.getAmount());
                 }
-                addToDebitors(debitors, debitor.getUser(), creditor.getUser(), creditor.getAmount());
+                addCreditorToDebitorInDebitors(debitors, debitor.getUser(), creditor.getUser(), creditor.getAmount());
             }
         }
     }
 
     private int forwardFound(List<ActivitySummaryDebitorsDTO> debitors, UserDTO debitorUser, UserDTO creditorUser) {
         int found = 0;
+        int debug = 0;
 
         for( ActivitySummaryDebitorsDTO debitor : debitors ) {
+            if (debug == 1) {
+                System.out.println("debitor : " + debitor.getUser().getFirstName());
+            }
             if (found == 0) {
                 if (debitor.getUser().getId().equals(debitorUser.getId())) {
                     found++;
+                    if (debug == 1) {
+                        System.out.println("found is : " + found);
+                    }
                     for ( ActivitySummaryCreditorDTO creditor : debitor.getCreditors() ) {
+                        if (debug == 1) {
+                            System.out.println("    creditor : " + creditor.getUser().getFirstName());
+                        }
                         if (found == 1) {
                             if (creditorUser.getId().equals(creditor.getUser().getId())) {
                                 found++;
+                                if (debug == 1) {
+                                    System.out.println("found is : " + found);
+                                }
                             }
                         }
                     }
@@ -164,18 +176,24 @@ public class EventService {
     private void createCreditorAndDebitorWithAmountAndAddToDebitors(List<ActivitySummaryDebitorsDTO> debitors, UserDTO creditor, UserDTO debitor, BigDecimal amount) {
         int debug = 1;
 
+        if (debug == 1) {
+            System.out.println("        createCreditorAndDebitorWithAmountAndAddToDebitors : creditor : " + creditor);
+            System.out.println("        createCreditorAndDebitorWithAmountAndAddToDebitors : debitor  : " + debitor);
+            System.out.println("        createCreditorAndDebitorWithAmountAndAddToDebitors : amount   : " + amount);
+        }
+
         ActivitySummaryDebitorsDTO activitySummaryDebitorsDTO = new ActivitySummaryDebitorsDTO();
         activitySummaryDebitorsDTO.setTotal(amount);
         activitySummaryDebitorsDTO.setUser(debitor);
 
         ActivitySummaryCreditorDTO activitySummaryCreditorDTO = new ActivitySummaryCreditorDTO();
-        activitySummaryCreditorDTO.setUser(creditor);
         activitySummaryCreditorDTO.setAmount(amount);
+        activitySummaryCreditorDTO.setUser(creditor);
 
         activitySummaryDebitorsDTO.addCreditor(activitySummaryCreditorDTO);
 
         if (debug == 1) {
-            System.out.println("adding : " + activitySummaryDebitorsDTO);
+            System.out.println("        createCreditorAndDebitorWithAmountAndAddToDebitors : result   : " + activitySummaryDebitorsDTO);
         }
 
         debitors.add(activitySummaryDebitorsDTO);
@@ -227,160 +245,163 @@ public class EventService {
     }
 
 
-    private void addToDebitors(List<ActivitySummaryDebitorsDTO> debitors, UserDTO debitorUser, UserDTO creditorUser, BigDecimal amount) {
+    private void addCreditorToDebitorInDebitors(List<ActivitySummaryDebitorsDTO> debitors, UserDTO debitorUser, UserDTO creditorUser, BigDecimal amount) {
         int debug = 1;
 
-        int forwardFound = forwardFound(debitors, debitorUser, creditorUser);
-        int reverseFound = reverseFound(debitors, debitorUser, creditorUser);
+        System.out.println("    debitorUser  - person who owes    : " + debitorUser.getFirstName());
+        System.out.println("    creditorUser - person who is owed : " + creditorUser.getFirstName());
+        System.out.println("    amount                            : " + amount);
+        System.out.println("    in plain english                  : " + debitorUser.getFirstName() + " owes " + creditorUser.getFirstName() + " " + amount);
+        System.out.println("----------------------------------------");
 
-        // reverse found takes precedence
+        int reverseFound = reverseFound(debitors, debitorUser, creditorUser);
+        int forwardFound = forwardFound(debitors, debitorUser, creditorUser);
+
+        // reverse found takes precedence, the two means that the forward was found AND the reverse was found
         if (reverseFound == 2) {
 
             if (debug == 1) {
-                System.out.println("    * working on canceling out");
+                System.out.println("    CCCCC : canceling out scenario, reverse match found");
             }
 
-            // concurrency issues:
-            // 1.  (okay) - we need to delete a creditor from a debitor, we can do that outside the creditor loop
-            // 2.  (okay) -  we need to update amounts for creditor - no issues here
-            // 3.  we need to add a creditor
-            // 3.1. possibly remove this creditor and add a debitor
+            System.out.println("    looking for the reverse entry");
 
-            // concurrency issue #3 and #3.1, rv < 0
+            int removeDebitorLoopBecauseEmpty = 0;
+            int reverseEntryFound = 0;
             ActivitySummaryDebitorsDTO debitorToRemove = null;
-            ActivitySummaryDebitorsDTO debitorToAdd = null;
+            ActivitySummaryCreditorDTO creditorToRemove = null;
+            UserDTO debitorUserToAdd = null;
+            UserDTO creditorUserToAdd = null;
+            BigDecimal createAmount = null;
+            BigDecimal addAmount = null;
 
             for(ActivitySummaryDebitorsDTO debitorLoop : debitors) {
-                System.out.println("        debitorLoop : " + debitorLoop);
-                if (debitorLoop.getUser().equals(creditorUser)) {
 
-                    System.out.printf("%s(creditor) owes %s(debitor) : %.2f\n ", creditorUser.getFirstName(), debitorLoop.getUser().getFirstName(), amount);
+                if (reverseEntryFound == 0) {
+                    System.out.println("        debitorLoop : " + debitorLoop.getUser().getFirstName() + ", debitorLoop compared to " + creditorUser.getFirstName() + ", creditor");
 
-                    // currency issue #1, rv = 0
-                    ActivitySummaryCreditorDTO creditorToDelete = null;
+                    if (debitorLoop.getUser().equals(creditorUser)) {
 
-                    // concurrency issue #3 and #3.1, rv < 0
-                    ActivitySummaryCreditorDTO creditorToAdd = null;
+                        for (ActivitySummaryCreditorDTO creditorLoop : debitorLoop.getCreditors()) {
+                            if (reverseEntryFound == 0) {
+                                System.out.println("            creditorLoop : " + creditorLoop.getUser().getFirstName() + ", creditorLoop compared to " + debitorUser.getFirstName() + ", debitor");
+                                if (creditorLoop.getUser().equals(debitorUser)) {
+                                    System.out.println("            ***** reverse entry found!");
+                                    reverseEntryFound = 1;
 
-                    for (ActivitySummaryCreditorDTO creditorLoop : debitorLoop.getCreditors()) {
-                        System.out.println("            creditorLoop : " + creditorLoop);
-                        if (creditorLoop.getUser().equals(debitorUser)) {
+                                    int rv = creditorLoop.getAmount().compareTo(amount);
+                                    System.out.println("            compare creditorLoop " + creditorLoop.getAmount() + ":y, to incoming amount of " + amount + ":x,  is : " + rv);
+                                    System.out.println("            x: " + creditorLoop.getAmount());
+                                    System.out.println("            y : " + amount);
 
-                            System.out.println("                okay - we need to figure out how much to remove here..." + amount);
-                            int rv = creditorLoop.getAmount().compareTo(amount);
+                                    if ( amount.compareTo(creditorLoop.getAmount()) > 0) {
+                                        System.out.println("            y > x");
 
-                            if ( rv == 0 ) {
+                                        System.out.println("            creditorToRemove : " + creditorLoop);
+                                        creditorToRemove = creditorLoop;
 
-                                System.out.println("                    they're equal - remove this entry");
-                                System.out.println("                    removing creditorLoop : " + creditorLoop);
+                                        int found = forwardFound(debitors, creditorLoop.getUser(), debitorLoop.getUser());
+                                        if (found == 2) {
+                                            System.out.println("                found = 2 | increment A by (y-x)");
+                                        } else if (found == 1) {
+                                            System.out.println("                found = 1 | add incomming creditorLoop A:" + creditorLoop.getUser().getFirstName() + " to debitorLoop B:" + debitorLoop.getUser().getFirstName() + " with amount (y-x):" + amount.subtract(creditorLoop.getAmount()));
 
-                                // reduce the amount
-                                debitorLoop.setTotal(debitorLoop.getTotal().subtract(amount));
+                                            creditorUserToAdd = creditorLoop.getUser();
+                                            addAmount = amount.subtract(creditorLoop.getAmount());
 
-                                // set that we need to remove this one
-                                creditorToDelete = creditorLoop;
+                                        } else if (found == 0) {
+                                            System.out.println("                found = 0 | create B:" + debitorLoop.getUser() + " -> A:" + creditorLoop.getUser() + " with amount (y-x)");
 
-                            }
-                            else if ( rv > 0 ) {
+                                            debitorUserToAdd = debitorLoop.getUser();
+                                            creditorUserToAdd = creditorLoop.getUser();
+                                            createAmount = amount.subtract(creditorLoop.getAmount());
 
-                                System.out.println("                    it's more, we'll just reduce the amount and total");
+                                        }
 
-                                // reduce the amount
-                                creditorLoop.setAmount(creditorLoop.getAmount().subtract(amount));
+                                    } else if ( amount.compareTo(creditorLoop.getAmount()) < 0) {
+                                        System.out.println("            y < x");
 
-                                // reduce the total
-                                debitorLoop.setTotal(debitorLoop.getTotal().subtract(amount));
+                                        System.out.println("total : " + debitorLoop.getTotal());
 
-                            }
-                            else if ( rv < 0 ) {
+                                        // now update the total, order is important here
+                                        debitorLoop.setTotal(debitorLoop.getTotal().subtract(amount));
 
-                                System.out.println("                    it's less, we'll need to remove this node and add another (or add to an existing)");
+                                        // NOW we can update the creditorLoop amount
+                                        creditorLoop.setAmount(creditorLoop.getAmount().subtract(amount));
 
-                                int subFound = forwardFound(debitors, debitorUser, creditorUser);
-                                System.out.println("subFound : " + subFound);
+                                    } else if ( creditorLoop.getAmount().compareTo(amount) == 0) {
+                                        System.out.println("            y = x");
 
-                                if (subFound == 1) {
-                                    // add
+                                        creditorToRemove = creditorLoop;
 
-                                    ActivitySummaryCreditorDTO newCreditor = new ActivitySummaryCreditorDTO();
-                                    newCreditor.setUser(creditorUser);
-                                    newCreditor.setAmount(amount.subtract(creditorLoop.getAmount()));
+                                    }
 
-                                    creditorToAdd = newCreditor;
-
-                                } else if (subFound == 0) {
-                                    // create
-
-                                    BigDecimal recalculatedAmount = amount.subtract(creditorLoop.getAmount());
-
-                                    ActivitySummaryCreditorDTO newCreditor = new ActivitySummaryCreditorDTO();
-                                    newCreditor.setUser(creditorUser);
-                                    newCreditor.setAmount(recalculatedAmount);
-
-                                    List<ActivitySummaryCreditorDTO> creditors = new ArrayList<>();
-                                    creditors.add(newCreditor);
-
-                                    ActivitySummaryDebitorsDTO newDebitor = new ActivitySummaryDebitorsDTO();
-                                    newDebitor.setUser(debitorUser);
-                                    newDebitor.setTotal(recalculatedAmount);
-                                    newDebitor.setCreditors(creditors);
-
-                                    debitorToAdd = newDebitor;
-
-                                    debitorToRemove = debitorLoop;
                                 }
                             }
+                        }
+
+                        // if we only have the case to add a creditor to this debitor, then we can proceed here
+                        if ( (creditorUserToAdd != null) && (debitorUserToAdd == null) && (createAmount == null) ) {
+
+                            // add the creditor
+                            ActivitySummaryCreditorDTO creditorDTO = new ActivitySummaryCreditorDTO();
+                            creditorDTO.setUser(creditorUserToAdd);
+                            creditorDTO.setAmount(addAmount);
+                            System.out.println("creditorUserToAdd : " + creditorDTO);
+                            debitorLoop.getCreditors().add(creditorDTO);
+
+                            // update the total
+                            debitorLoop.setTotal(debitorLoop.getTotal().add(addAmount));
+
+                        }
+
+                        // remove a creditor and the debitor if there are none left
+                        if (creditorToRemove != null) {
+
+                            System.out.println("creditorToRemove : " + creditorToRemove);
+                            debitorLoop.getCreditors().remove(creditorToRemove);
+
+                            System.out.println("creditorToRemove : checking to see if we should remove this debitor also : " + debitorLoop.getCreditors().size());
+                            if (debitorLoop.getCreditors().size() == 0) {
+                                System.out.println("creditorToRemove : yes, remove");
+                                removeDebitorLoopBecauseEmpty = 1;
+                                debitorToRemove = debitorLoop;
+                            } else {
+                                System.out.println("creditorToRemove : no, do not remove because it has a size greater than 0");
+                            }
+
+                            // update the total
+                            System.out.println("creditorToRemove : subtracting " + creditorToRemove.getAmount() + " from the debitorLoop total");
+                            debitorLoop.setTotal(debitorLoop.getTotal().subtract(creditorToRemove.getAmount()));
 
                         }
                     }
-
-                    // remove creditor outsize the iteration
-                    if (creditorToDelete != null) {
-                        System.out.println("deleting creditor");
-
-                        debitorLoop.getCreditors().remove(creditorToDelete);
-
-                        // if there are no more creditors, then remove
-                        if (debitorLoop.getCreditors().size() == 0) {
-                            debitorToRemove = debitorLoop;
-                        }
-
-                    }
-
-                    if (creditorToAdd != null) {
-                        System.out.println("adding creditor");
-
-                        // add creditor
-                        debitorLoop.addCreditor(creditorToAdd);
-
-                        // update amount
-                        debitorLoop.setTotal(debitorLoop.getTotal().add(amount));
-                    }
-
-
                 }
-            }
-
-            // remove/add the debitor outside the iteration
-            if ( (debitorToRemove != null) && (debitorToAdd != null) ) {
-                debitors.remove(debitorToRemove);
-
-                debitors.add(debitorToAdd);
-            } else if (debitorToRemove != null) {
-
-                // this is the use case where there was a cancel out
-                debitors.remove(debitorToRemove);
 
             }
 
-        } else if (forwardFound == 0) {
+            if (removeDebitorLoopBecauseEmpty == 1) {
 
-            if (debug == 1) { System.out.println("    * adding because not forwardFound"); }
+                System.out.println("removeDebitorLoopBecauseEmpty : removing debitorLoop from debitors");
+                debitors.remove(debitorToRemove);
+
+                // no need to set the total because the debitor is getting removed
+            }
+
+            if ( (debitorUserToAdd != null) && (creditorUserToAdd != null) && (createAmount != null) ) {
+                createCreditorAndDebitorWithAmountAndAddToDebitors(debitors, debitorUserToAdd, creditorUserToAdd, createAmount);
+            }
+
+        }
+        else if (forwardFound == 0) {
+
+            if (debug == 1) { System.out.println("    AAAAA : adding because not forwardFound, basically the creditor " + creditorUser.getFirstName() + " is not found in our debitors array"); }
             createCreditorAndDebitorWithAmountAndAddToDebitors(debitors, creditorUser, debitorUser, amount);
 
-        } else if (forwardFound > 0) {
+        }
+        else if (forwardFound > 0) {
 
-            if (debug == 1) { System.out.println("      # forwardFound : " + forwardFound); }
+            if (debug == 1) { System.out.println("      FFFFF : forwardFound : " + forwardFound); }
 
             if (forwardFound == 1) {
 
@@ -396,15 +417,19 @@ public class EventService {
 
         }
 
+        System.out.println("----------------------------------------\n");
 
         // output the current debitors
         if (debug == 1) {
-            System.out.println("--------------------");
-            System.out.println("resulting array of debtors and their creditors");
+            System.out.println("***** ----------------------------------------------- *****");
+            System.out.println("***** resulting array of debitors and their creditors *****");
+            System.out.println("***** ----------------------------------------------- *****");
+            int index = 1;
             for (ActivitySummaryDebitorsDTO debitorLoop : debitors) {
-                System.out.println("    * : " + debitorLoop);
+                System.out.println("  " + index + " : " + debitorLoop);
+                index++;
             }
-            System.out.println("----------------------------------------");
+            System.out.println("***** ----------------------------------------------- *****");
         }
     }
 

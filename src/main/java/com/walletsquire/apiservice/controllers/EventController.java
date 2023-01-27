@@ -223,7 +223,10 @@ public class EventController {
 
             List<ActivitySummaryDebitorsDTO> debitors = new ArrayList<>();
 
+            int index = 1;
             for(Activity activity: event.getActivities()) {
+
+                System.out.printf("\n\n%d\n", index++);
 
                 // combine the debtors
                 eventService.combineActivityDebitors(debitors, activityService.getDebitors(activity));
@@ -232,7 +235,7 @@ public class EventController {
                 //eventSummaryDTO.getActivities().add(activityMapper.toDto(activity));
 
                 // update the eventSummaryDTO.total
-                //eventSummaryDTO.setTotal(eventSummaryDTO.getTotal().add(activity.getAmount()));
+                eventSummaryDTO.setTotal(eventSummaryDTO.getTotal().add(activity.getAmount()));
 
             }
 
