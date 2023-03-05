@@ -28,6 +28,6 @@ public class EventSummaryDTO {
 
     private List<ActivityDTO> activities = new ArrayList<>();
 
-    private List<ActivitySummaryDebitorsDTO> debitors = new ArrayList<>();
+    private List<DebitorDTO> debitors = new ArrayList<>();
 
 }

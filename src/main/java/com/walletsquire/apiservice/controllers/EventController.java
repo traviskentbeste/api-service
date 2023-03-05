@@ -237,7 +237,7 @@ public class EventController {
 
             }
 
-            eventSummaryDTO.setDebitors(debitors);
+            //eventSummaryDTO.setDebitors(debitors);
 
             return new ResponseEntity<>(eventSummaryDTO, HttpStatus.OK);
         }
