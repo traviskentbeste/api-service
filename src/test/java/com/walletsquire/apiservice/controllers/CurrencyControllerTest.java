@@ -86,6 +86,15 @@ public class CurrencyControllerTest {
     @MockBean
     CategoryService categoryService;
 
+    @MockBean
+    CreditorService creditorService;
+
+    @MockBean
+    DebitorService debitorService;
+
+    @MockBean
+    EventSummaryService eventSummaryService;
+
     /* entities/DTOs go here for testing */
     Currency entity1 = new Currency();
     Currency entity2 = new Currency();

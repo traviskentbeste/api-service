@@ -19,7 +19,7 @@ public class User extends BaseEntity {
     private String firstName;
     private String lastName;
 
-    @OneToMany(mappedBy = "user")
-    private Set<PaidUsers> paidUsers = new HashSet<>();
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+//    private Set<PaidUsers> paidUsers = new HashSet<>();
 
 }

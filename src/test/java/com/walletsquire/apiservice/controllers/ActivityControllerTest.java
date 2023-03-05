@@ -88,6 +88,15 @@ public class ActivityControllerTest {
     @MockBean
     PaidService paidService;
 
+    @MockBean
+    CreditorService creditorService;
+
+    @MockBean
+    DebitorService debitorService;
+
+    @MockBean
+    EventSummaryService eventSummaryService;
+
     /* entities/DTOs go here for testing */
     Activity entity1 = new Activity();
     Activity entity2 = new Activity();

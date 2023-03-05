@@ -1,7 +1,7 @@
 package com.walletsquire.apiservice.cucumber;
 
 import com.google.gson.Gson;
-import com.walletsquire.apiservice.entities.Category;
+import com.walletsquire.apiservice.entities.Debitor;
 import com.walletsquire.apiservice.entities.Health;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -16,15 +16,17 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-public class CategorySteps {
+
+public class DebitorSteps {
 
     @Autowired
     private CucumberHttpClient cucumberHttpClient;
 
     private String requestUrl;
     private String requestEndpoint;
-    private List<Category> entityList = new ArrayList<>();
-    @Given("The category is available at {string} with endpoint {string}")
+    private List<Debitor> entityList = new ArrayList<>();
+
+    @Given("The debitor is available at {string} with endpoint {string}")
     public void theApplicationIsAvailableAt(String url, String endpoint) throws IOException {
 
         requestUrl = url;
@@ -34,17 +36,7 @@ public class CategorySteps {
 
     }
 
-    @And("Health check is ok")
-    public void healthCheckIsFineAt() {
-
-        ResponseEntity<String> response = cucumberHttpClient.getAll(requestUrl, "/actuator/health");
-        Gson gson = new Gson();
-        Health health = gson.fromJson(response.getBody(), Health.class);
-        assertEquals(health.getStatus(), "UP");
-
-    }
-
-    @When("I fetch the category")
+    @When("I fetch the debitor")
     public void iFetchArray() {
 
         ResponseEntity<String> response = cucumberHttpClient.getAll(requestUrl, requestEndpoint);
@@ -53,7 +45,7 @@ public class CategorySteps {
 
     }
 
-    @Then("I should find at least {int} category")
+    @Then("I should find at least {int} debitor")
     public void iShouldFindArray(int count) {
 
         assertTrue(entityList.size() >= count );
