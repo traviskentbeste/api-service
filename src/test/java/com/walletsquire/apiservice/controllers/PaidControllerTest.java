@@ -1,5 +1,6 @@
 package com.walletsquire.apiservice.controllers;
 
+import com.walletsquire.apiservice.entities.EventSummary;
 import com.walletsquire.apiservice.entities.Paid;
 import com.walletsquire.apiservice.dtos.PaidDTO;
 import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
@@ -86,6 +87,15 @@ public class PaidControllerTest {
 
     @MockBean
     PaidUsersService paidUsersService;
+
+    @MockBean
+    CreditorService creditorService;
+
+    @MockBean
+    DebitorService debitorService;
+
+    @MockBean
+    EventSummaryService eventSummaryService;
 
     /* entities/DTOs go here for testing */
     Paid entity1 = new Paid();

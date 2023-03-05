@@ -215,10 +215,8 @@ public class EventController {
                 System.out.println("event : " + event);
             }
 
-            eventSummaryDTO.setName(event.getName());
-            eventSummaryDTO.setDescription(event.getDescription());
-            eventSummaryDTO.setActivitiesCount(event.getActivities().size());
-            eventSummaryDTO.setTotal(BigDecimal.ZERO);
+            eventSummaryDTO.setEvent(eventMapper.toDto(event));
+            eventSummaryDTO.setAmount(BigDecimal.ZERO);
             eventSummaryDTO.setActivities(new ArrayList<>());
 
             List<ActivitySummaryDebitorsDTO> debitors = new ArrayList<>();
@@ -235,7 +233,7 @@ public class EventController {
                 //eventSummaryDTO.getActivities().add(activityMapper.toDto(activity));
 
                 // update the eventSummaryDTO.total
-                eventSummaryDTO.setTotal(eventSummaryDTO.getTotal().add(activity.getAmount()));
+                eventSummaryDTO.setAmount(eventSummaryDTO.getAmount().add(activity.getAmount()));
 
             }
 

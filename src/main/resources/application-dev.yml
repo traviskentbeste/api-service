@@ -60,6 +60,6 @@ spring:
 #          descriptor:
 #            sql:
 #              BasicBinder: TRACE
-#
+
 #debug: true
 #trace: true

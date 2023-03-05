@@ -84,6 +84,15 @@ public class AddressControllerTest {
     @MockBean
     CategoryService categoryService;
 
+    @MockBean
+    CreditorService creditorService;
+
+    @MockBean
+    DebitorService debitorService;
+
+    @MockBean
+    EventSummaryService eventSummaryService;
+
     /* entities/DTOs go here for testing */
     Address entity1 = new Address();
     Address entity2 = new Address();

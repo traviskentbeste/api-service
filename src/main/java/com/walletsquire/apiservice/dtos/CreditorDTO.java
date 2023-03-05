@@ -1,6 +1,7 @@
 package com.walletsquire.apiservice.dtos;
 
-import com.walletsquire.apiservice.entities.Event;
+import com.walletsquire.apiservice.entities.Debitor;
+import com.walletsquire.apiservice.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,22 +13,16 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventSummaryDTO {
+public class CreditorDTO {
 
     private Long id;
 
     private BigDecimal amount;
 
-    private EventDTO event;
-
-    private List<ActivityDTO> activities = new ArrayList<>();
-
-    private List<ActivitySummaryDebitorsDTO> debitors = new ArrayList<>();
+    private UserDTO user;
 
 }

@@ -80,6 +80,15 @@ public class CategoryControllerTest {
     @MockBean
     CurrencyService currencyService;
 
+    @MockBean
+    CreditorService creditorService;
+
+    @MockBean
+    DebitorService debitorService;
+
+    @MockBean
+    EventSummaryService eventSummaryService;
+
     /* entities/DTOs go here for testing */
     Category entity1 = new Category();
     Category entity2 = new Category();

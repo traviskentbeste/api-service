@@ -98,6 +98,15 @@ public class EventControllerTest {
     @MockBean
     PaidUsersService paidUsersService;
 
+    @MockBean
+    CreditorService creditorService;
+
+    @MockBean
+    DebitorService debitorService;
+
+    @MockBean
+    EventSummaryService eventSummaryService;
+
     /* entities/DTOs go here for testing */
     Event entity1 = new Event();
     Event entity2 = new Event();

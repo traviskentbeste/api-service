@@ -1,24 +1,16 @@
 package com.walletsquire.apiservice.controllers;
 
-import com.walletsquire.apiservice.dtos.PaidDTO;
-import com.walletsquire.apiservice.dtos.UserDTO;
-import com.walletsquire.apiservice.entities.Paid;
-import com.walletsquire.apiservice.entities.PaidUsers;
-import com.walletsquire.apiservice.dtos.PaidUsersDTO;
-import com.walletsquire.apiservice.entities.User;
-import com.walletsquire.apiservice.mappers.CategoryMapperQualifier;
-import com.walletsquire.apiservice.mappers.PaidMapper;
-import com.walletsquire.apiservice.mappers.PaidUsersMapper;
-import com.walletsquire.apiservice.mappers.UserMapper;
+import com.walletsquire.apiservice.entities.Debitor;
+import com.walletsquire.apiservice.dtos.DebitorDTO;
+import com.walletsquire.apiservice.entities.Event;
+import com.walletsquire.apiservice.mappers.DebitorMapper;
 import com.walletsquire.apiservice.services.*;
 import com.walletsquire.apiservice.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.hu.Ha;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,14 +29,16 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolationException;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,12 +46,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-@WebMvcTest( controllers = PaidUsersController.class )
-@ComponentScan(basePackageClasses = PaidUsersMapper.class)
+@WebMvcTest( controllers = DebitorController.class )
+@ComponentScan(basePackageClasses = DebitorMapper.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ActiveProfiles("dev")
 @TestMethodOrder(OrderAnnotation.class)
-public class PaidUsersControllerTest {
+public class DebitorControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -66,55 +60,37 @@ public class PaidUsersControllerTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    PaidUsersMapper mapper;
+    DebitorMapper mapper;
 
     @Autowired
-    PaidUsersController controller;
+    DebitorController controller;
 
     String endpoint = "/api/v1" + controller.endpoint;
 
     // mock objects
     @MockBean
-    PaidUsersService service;
-
-    @MockBean
-    CategoryMapperQualifier categoryMapperQualifier;
-
-    @MockBean
-    UserService userService;
-
-    @MockBean
-    PaidService paidService;
+    DebitorService service;
 
     @MockBean
     AddressService addressService;
 
     @MockBean
-    CurrencyService currencyService;
-
-    @MockBean
     CategoryService categoryService;
-
-    @MockBean
-    PaidMapper paidMapper;
-
-    @MockBean
-    UserMapper userMapper;
 
     @MockBean
     CreditorService creditorService;
 
     @MockBean
-    DebitorService debitorService;
+    CurrencyService currencyService;
 
     @MockBean
     EventSummaryService eventSummaryService;
 
     /* entities/DTOs go here for testing */
-    PaidUsers entity1 = new PaidUsers();
-    PaidUsers entity2 = new PaidUsers();
-    PaidUsersDTO entityDTO1 = new PaidUsersDTO();
-    PaidUsersDTO entityDTO2 = new PaidUsersDTO();
+    Debitor entity1 = new Debitor();
+    Debitor entity2 = new Debitor();
+    DebitorDTO entityDTO1 = new DebitorDTO();
+    DebitorDTO entityDTO2 = new DebitorDTO();
 
     public String asJsonString(final Object obj) {
         try {
@@ -128,32 +104,11 @@ public class PaidUsersControllerTest {
     @Order(1)
     public void create() throws Exception {
 
-        Paid paid1 = new Paid();
-        paid1.setId(1L);
-
-        User user1 = new User();
-        user1.setId(1L);
-
-        PaidDTO paidDTO = new PaidDTO();
-        paidDTO.setId(1L);
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(1L);
-
         entity1.setId(1L);
-        entity1.setAmount(BigDecimal.valueOf(1));
-        entity1.setPaid(paid1);
-        entity1.setUser(user1);
 
         entityDTO1.setId(1L);
-        entityDTO1.setAmount(BigDecimal.valueOf(1));
-        entityDTO1.setPaid(paidDTO);
-        entityDTO1.setUser(userDTO);
 
-        when(paidService.getById(1L)).thenReturn(Optional.of(paid1));
-        when(userService.getById(1L)).thenReturn(Optional.of(user1));
-
-        when(service.create(entity1)).thenReturn(entity1);
+        when(service.create(any(Debitor.class))).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders
                 .post(endpoint)
@@ -173,7 +128,6 @@ public class PaidUsersControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.amount", equalTo(1)))
                 .andDo(print())
                 ;
 
@@ -184,10 +138,6 @@ public class PaidUsersControllerTest {
     public void getById() throws Exception {
 
         entity1.setId(1L);
-        entity1.setAmount(BigDecimal.valueOf(1));
-
-        entityDTO1.setId(1L);
-        entityDTO1.setAmount(BigDecimal.valueOf(1));
 
         when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
@@ -196,7 +146,7 @@ public class PaidUsersControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.amount", equalTo(1)));
+                ;
 
     }
 
@@ -204,12 +154,7 @@ public class PaidUsersControllerTest {
     @Order(3)
     public void getAll() throws Exception {
 
-        entity1.setAmount(BigDecimal.valueOf(1));
-
-        entityDTO1.setId(1L);
-        entityDTO1.setAmount(BigDecimal.valueOf(1));
-
-        List<PaidUsers> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
+        List<Debitor> entitys = new ArrayList<>(Arrays.asList(entity1, entity2));
 
         when(service.getAll()).thenReturn(entitys);
 
@@ -219,7 +164,7 @@ public class PaidUsersControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].amount", equalTo(1)));
+                ;
 
     }
 
@@ -228,14 +173,12 @@ public class PaidUsersControllerTest {
     public void update() throws Exception {
 
         entity1.setId(1L);
-        entity1.setAmount(BigDecimal.valueOf(1));
 
         entityDTO1.setId(1L);
-        entityDTO1.setAmount(BigDecimal.valueOf(1));
 
-        when(service.getById(1L)).thenReturn(Optional.of(entity1));
+        when(service.getById(entity1.getId())).thenReturn(java.util.Optional.of(entity1));
 
-        when(service.update(any(PaidUsers.class), any(PaidUsersDTO.class), any(Long.class))).thenReturn(entity1);
+        when(service.update(any(Debitor.class), anyLong())).thenReturn(entity1);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.put(endpoint + "/" + entityDTO1.getId() )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -245,7 +188,7 @@ public class PaidUsersControllerTest {
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.amount", is(1)));
+                ;
 
     }
 
@@ -459,7 +402,7 @@ public class PaidUsersControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
-                .andExpect(result -> assertEquals("PaidUsers was not found for parameters {id=2}", result.getResolvedException().getMessage()));
+                .andExpect(result -> assertEquals("Debitor was not found for parameters {id=2}", result.getResolvedException().getMessage()));
 
     }
 
